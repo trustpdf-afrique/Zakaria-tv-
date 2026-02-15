@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>True Crime & Mystères Réels - Zakaria TV</title>
+
+<!-- POLICE -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Roboto Slab', serif;
+  background:#0b0c10;
+  color:white;
+  text-align:center;
+  overflow-x:hidden;
+}
+
+/* TITRE BRILLANT */
+header{
+  padding:40px 15px;
+}
+header h1{
+  font-size:42px;
+  font-weight:900;
+  background: linear-gradient(90deg,#b71c1c,#4a148c,#0d47a1,#f9a825,#006064);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:5px;
+  text-shadow: 0 0 15px #000;
+}
+header h2{
+  font-size:22px;
+  letter-spacing:3px;
+  margin-top:0;
+  color:#fff;
+  text-shadow:0 0 10px #000;
+}
+
+/* CONTAINER */
+.container{
+  padding:20px;
+}
+
+/* CATEGORIES */
+.category{
+  margin:20px 0;
+  padding:25px;
+  border-radius:25px;
+  font-size:24px;
+  font-weight:bold;
+  cursor:pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  color:white;
+}
+.category:hover{
+  transform: scale(1.05);
+  box-shadow:0 0 25px rgba(255,255,255,0.5);
+}
+.cat1{background:#b71c1c;}  /* rouge foncé */
+.cat2{background:#4a148c;}  /* violet sombre */
+.cat3{background:#0d47a1;}  /* bleu nuit */
+.cat4{background:#f9a825;}  /* or / jaune sombre */
+.cat5{background:#006064;}  /* cyan profond */
+
+/* PAGE EPISODES */
+#pageEpisodes{
+  display:none;
+  flex-direction:column;
+  padding:20px;
+  min-height:100vh;
+}
+.episode-btn{
+  margin:12px 0;
+  padding:20px;
+  border-radius:20px;
+  font-size:22px;
+  font-weight:bold;
+  color:white;
+  cursor:pointer;
+  transition:0.3s;
+  background: linear-gradient(120deg,#222,#333);
+  box-shadow:0 0 15px rgba(255,255,255,0.2);
+}
+.episode-btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 25px rgba(255,255,255,0.4);
+}
+
+/* PAGE EPISODE TEXTE */
+#pageEpisode{
+  display:none;
+  flex-direction:column;
+  padding:20px;
+  min-height:100vh;
+}
+#episodeTitle{
+  font-size:26px;
+  margin-bottom:15px;
+  color:#f9a825;
+  text-shadow:0 0 10px #000;
+}
+textarea{
+  flex:1;
+  width:100%;
+  border-radius:20px;
+  border:none;
+  padding:20px;
+  font-size:18px;
+  line-height:1.8;
+  resize:none;
+  outline:none;
+  background:rgba(30,30,30,0.95);
+  color:#fff;
+  margin-bottom:15px;
+  box-shadow: 0 0 15px rgba(0,255,255,0.2);
+  font-family:'Roboto Slab', serif;
+}
+button{
+  padding:15px;
+  border:none;
+  border-radius:20px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-bottom:10px;
+  transition:0.3s;
+}
+button:hover{
+  transform:scale(1.03);
+}
+
+/* BOUTONS SPECIAUX */
+.backBtn{background:#555; color:white; box-shadow:0 0 10px #000;}
+.saveBtn{background:#4caf50; color:white; box-shadow:0 0 15px #4caf50;}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>TRUE CRIME & MYSTÈRES RÉELS</h1>
+  <h2>ZAKARIA TV</h2>
+</header>
+
+<!-- PAGE PRINCIPALE CATEGORIES -->
+<div class="container" id="home">
+  <div class="category cat1">🔪 Crimes Célèbres</div>
+  <div class="category cat2">👻 Mystères Non Résolus</div>
+  <div class="category cat3">🕵🏾 Disparitions Étranges</div>
+  <div class="category cat4">🏚️ Histoires Terrifiantes</div>
+  <div class="category cat5">📰 Affaires Insolites</div>
+</div>
+
+<!-- PAGE EPISODES -->
+<div class="container" id="pageEpisodes">
+  <h2 id="categoryTitle"></h2>
+  <div id="episodesContainer"></div>
+  <button class="backBtn" onclick="backToHome()">⬅ Retour</button>
+</div>
+
+<!-- PAGE EPISODE TEXTE -->
+<div class="container" id="pageEpisode">
+  <h2 id="episodeTitle"></h2>
+  <textarea id="episodeText" placeholder="✍️ Écris ton texte ici…"></textarea>
+  <button class="saveBtn" id="saveBtn">💾 Enregistrer</button>
+  <button class="backBtn" onclick="backToEpisodes()">⬅ Retour</button>
+</div>
+
+<script>
+let currentCategory="";
+let currentEpisode="";
+
+// CATEGORIES CLIQUABLES
+document.querySelectorAll('.category').forEach((cat, idx)=>{
+  cat.addEventListener('click', ()=>{
+    currentCategory = cat.innerText;
+    document.getElementById('home').style.display='none';
+    document.getElementById('pageEpisodes').style.display='flex';
+    document.getElementById('categoryTitle').innerText = currentCategory;
+
+    let container = document.getElementById('episodesContainer');
+    container.innerHTML='';
+    for(let i=1;i<=10;i++){
+      let btn = document.createElement('div');
+      btn.className='episode-btn';
+      btn.innerText='Épisode '+i;
+      btn.style.backgroundColor = `hsl(${i*36},30%,25%)`; // couleurs sombres harmonieuses
+      btn.addEventListener('click', ()=>{
+        openEpisode(i);
+      });
+      container.appendChild(btn);
+    }
+  });
+});
+
+// OUVRIR EPISODE
+function openEpisode(n){
+  currentEpisode = n;
+  document.getElementById('pageEpisodes').style.display='none';
+  document.getElementById('pageEpisode').style.display='flex';
+  document.getElementById('episodeTitle').innerText=currentCategory+" - Épisode "+n;
+
+  let key = currentCategory+"_Episode"+n;
+  document.getElementById('episodeText').value = localStorage.getItem(key)||"";
+
+  // Sauvegarde uniquement si bouton cliqué
+  document.getElementById('saveBtn').onclick = function(){
+    localStorage.setItem(key, document.getElementById('episodeText').value);
+    alert("✅ Texte enregistré !");
+  }
+}
+
+// BOUTONS RETOUR
+function backToHome(){
+  document.getElementById('pageEpisodes').style.display='none';
+  document.getElementById('home').style.display='block';
+}
+function backToEpisodes(){
+  document.getElementById('pageEpisode').style.display='none';
+  document.getElementById('pageEpisodes').style.display='flex';
+}
+</script>
+
+</body>
+    </html>
