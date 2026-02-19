@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>HISTOIRES AFRICAINES & LEADERS - Zakaria TV</title>
 
-<!-- POLICE -->
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
@@ -18,7 +17,77 @@ body{
   overflow-x:hidden;
 }
 
-/* TITRE BRILLANT */
+/* --- ÉCRAN DE VERROUILLAGE --- */
+#lockScreen{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:linear-gradient(135deg,#0b0c10,#1f2833);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
+.lockBox{
+  background:#111;
+  padding:40px;
+  border-radius:25px;
+  width:90%;
+  max-width:400px;
+  box-shadow:0 0 30px rgba(0,255,255,0.2);
+  text-align:center;
+  animation:fadeIn 0.6s ease;
+}
+
+.lockBox h1{
+  margin-bottom:10px;
+}
+
+.lockBox input{
+  width:100%;
+  padding:15px;
+  margin-top:15px;
+  border:none;
+  border-radius:15px;
+  font-size:18px;
+  background:#222;
+  color:white;
+  outline:none;
+}
+
+.lockBox button{
+  width:100%;
+  padding:15px;
+  margin-top:15px;
+  border:none;
+  border-radius:15px;
+  font-size:18px;
+  font-weight:bold;
+  background:#4caf50;
+  color:white;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.lockBox button:hover{
+  transform:scale(1.05);
+}
+
+#errorMsg{
+  color:#ff5252;
+  margin-top:10px;
+  height:20px;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* --- TITRE ET APP --- */
 header{
   padding:40px 15px;
 }
@@ -39,12 +108,10 @@ header h2{
   text-shadow:0 0 10px #000;
 }
 
-/* CONTAINER */
 .container{
   padding:20px;
 }
 
-/* CATEGORIES */
 .category{
   margin:20px 0;
   padding:25px;
@@ -59,13 +126,12 @@ header h2{
   transform: scale(1.05);
   box-shadow:0 0 25px rgba(255,255,255,0.5);
 }
-.cat1{background:#b71c1c;}  /* rouge foncé */
-.cat2{background:#4a148c;}  /* violet sombre */
-.cat3{background:#0d47a1;}  /* bleu nuit */
-.cat4{background:#f9a825;}  /* or / jaune sombre */
-.cat5{background:#006064;}  /* cyan profond */
+.cat1{background:#b71c1c;}
+.cat2{background:#4a148c;}
+.cat3{background:#0d47a1;}
+.cat4{background:#f9a825;}
+.cat5{background:#006064;}
 
-/* PAGE EPISODES */
 #pageEpisodes{
   display:none;
   flex-direction:column;
@@ -89,7 +155,6 @@ header h2{
   box-shadow:0 0 25px rgba(255,255,255,0.4);
 }
 
-/* PAGE EPISODE TEXTE */
 #pageEpisode{
   display:none;
   flex-direction:column;
@@ -132,7 +197,6 @@ button:hover{
   transform:scale(1.03);
 }
 
-/* BOUTONS SPECIAUX */
 .backBtn{background:#555; color:white; box-shadow:0 0 10px #000;}
 .saveBtn{background:#4caf50; color:white; box-shadow:0 0 15px #4caf50;}
 </style>
@@ -140,27 +204,39 @@ button:hover{
 
 <body>
 
+<!-- ÉCRAN DE MOT DE PASSE -->
+<div id="lockScreen">
+  <div class="lockBox">
+    <h1>🔐 Accès Privé</h1>
+    <p>Entre le mot de passe pour accéder à la bibliothèque</p>
+    <input type="password" id="passwordInput" placeholder="Mot de passe">
+    <button onclick="checkPassword()">Entrer</button>
+    <div id="errorMsg"></div>
+  </div>
+</div>
+
+<!-- TOUTE L'APP DANS CE CONTAINER -->
+<div id="app" style="display:none;">
+
 <header>
   <h1>HISTOIRES AFRICAINES & LEADERS</h1>
   <h2>ZAKARIA TV</h2>
 </header>
 
-<!-- PAGE PRINCIPALE CATEGORIES -->
 <div class="container" id="home">
-  <div class="category cat1">🔪 HISTOIRES ANCIENNES</div>
-  <div class="category cat2">👻 HISTOIRES LEADERS</div>
-  <div class="category cat3">🕵🏾 HISTOIRES 2025- 2026</div>
-  <div class="category cat4">🏚️ HISTOIRE CULTURELLES</div>
-  <div class="category cat5">📰 PRÉSIDENTS MILITAIRES</div>
+  <div class="category cat1">🔥 HISTOIRES INCONTOURNABLES</div>
+  <div class="category cat2">👑 GRANDS LEADERS AFRICAINS</div>
+  <div class="category cat3">🌍 AFRIQUE MODERNE (2000–2025)</div>
+  <div class="category cat4">🏺 CIVILISATIONS & CULTURES</div>
+  <div class="category cat5">⚔️ POUVOIR & CONFLITS</div>
+</div>
 
-<!-- PAGE EPISODES -->
 <div class="container" id="pageEpisodes">
   <h2 id="categoryTitle"></h2>
   <div id="episodesContainer"></div>
   <button class="backBtn" onclick="backToHome()">⬅ Retour</button>
 </div>
 
-<!-- PAGE EPISODE TEXTE -->
 <div class="container" id="pageEpisode">
   <h2 id="episodeTitle"></h2>
   <textarea id="episodeText" placeholder="✍️ Écris ton texte ici…"></textarea>
@@ -168,11 +244,32 @@ button:hover{
   <button class="backBtn" onclick="backToEpisodes()">⬅ Retour</button>
 </div>
 
+</div> <!-- FIN APP -->
+
 <script>
+const PASSWORD = "ZAKARIA TV"; // mot de passe exact
+
+function checkPassword(){
+  const input = document.getElementById("passwordInput").value;
+  const lockScreen = document.getElementById("lockScreen");
+
+  if(input === PASSWORD){
+    lockScreen.style.display="none";
+    document.getElementById("app").style.display="block";
+  }else{
+    lockScreen.style.background="linear-gradient(135deg,#8b0000,#ff0000)";
+    document.getElementById("errorMsg").innerText="❌ MOT DE PASSE INCORRECT";
+
+    // Retour couleur normale après 1 seconde
+    setTimeout(()=>{
+      lockScreen.style.background="linear-gradient(135deg,#0b0c10,#1f2833)";
+    },1000);
+  }
+}
+
 let currentCategory="";
 let currentEpisode="";
 
-// CATEGORIES CLIQUABLES
 document.querySelectorAll('.category').forEach((cat, idx)=>{
   cat.addEventListener('click', ()=>{
     currentCategory = cat.innerText;
@@ -186,7 +283,7 @@ document.querySelectorAll('.category').forEach((cat, idx)=>{
       let btn = document.createElement('div');
       btn.className='episode-btn';
       btn.innerText='Épisode '+i;
-      btn.style.backgroundColor = `hsl(${i*36},30%,25%)`; // couleurs sombres harmonieuses
+      btn.style.backgroundColor = `hsl(${i*36},30%,25%)`;
       btn.addEventListener('click', ()=>{
         openEpisode(i);
       });
@@ -195,7 +292,6 @@ document.querySelectorAll('.category').forEach((cat, idx)=>{
   });
 });
 
-// OUVRIR EPISODE
 function openEpisode(n){
   currentEpisode = n;
   document.getElementById('pageEpisodes').style.display='none';
@@ -205,14 +301,12 @@ function openEpisode(n){
   let key = currentCategory+"_Episode"+n;
   document.getElementById('episodeText').value = localStorage.getItem(key)||"";
 
-  // Sauvegarde uniquement si bouton cliqué
   document.getElementById('saveBtn').onclick = function(){
     localStorage.setItem(key, document.getElementById('episodeText').value);
     alert("✅ Texte enregistré !");
   }
 }
 
-// BOUTONS RETOUR
 function backToHome(){
   document.getElementById('pageEpisodes').style.display='none';
   document.getElementById('home').style.display='block';
@@ -224,4 +318,4 @@ function backToEpisodes(){
 </script>
 
 </body>
-    </html>
+</html>
