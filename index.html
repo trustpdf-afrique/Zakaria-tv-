@@ -2067,37 +2067,57 @@ Réponse : B..."></textarea>
             }
         }
 
-        // LECTURE VOCALE CONTINU : Question -> Option A -> B -> C -> D
+        // LECTURE VOCALE ROBUSTE ET COMPATIBLE TOUS APPAREILS (Question -> Option A -> B -> C -> D)
         function playAudioQuestion() {
-            if (!('speechSynthesis' in window)) return;
-
+            if (!('speechSynthesis' in window) || !currentQuiz || !currentQuiz.questions[currentQuestionIdx]) return;
+            
+            // Annuler toute lecture en cours pour éviter les chevauchements
             window.speechSynthesis.cancel();
 
-            if (!currentQuiz || !currentQuiz.questions || !currentQuiz.questions[currentQuestionIdx]) return;
-
             const qData = currentQuiz.questions[currentQuestionIdx];
-            const labels = ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'];
+            const labels = ['Option A', 'Option B', 'Option C', 'Option D'];
+            
+            let textToRead = qData.q + ". ";
+            qData.options.forEach((opt, idx) => {
+                textToRead += `${labels[idx]} : ${opt}. `;
+            });
 
-            let fullText = `${qData.q}. `;
-            if (Array.isArray(qData.options)) {
-                qData.options.forEach((opt, idx) => {
-                    const label = labels[idx] || `Réponse ${idx + 1}`;
-                    fullText += `${label} : ${opt}. `;
-                });
+            // Découpage du texte en segments courts (phrases/propositions) pour contourner les limitations des navigateurs mobiles (iOS Safari, Android Chrome)
+            const parts = textToRead.match(/[^.!?]+[.!?]+/g) || [textToRead];
+            
+            function speakParts(index) {
+                if (index >= parts.length) return;
+
+                const utterance = new SpeechSynthesisUtterance(parts[index].trim());
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.95;
+
+                // Tenter de sélectionner une voix française native disponible sur le système
+                const voices = window.speechSynthesis.getVoices();
+                const frVoice = voices.find(v => v.lang.startsWith('fr') || v.lang.includes('FR'));
+                if (frVoice) {
+                    utterance.voice = frVoice;
+                }
+
+                utterance.onend = () => {
+                    speakParts(index + 1);
+                };
+
+                utterance.onerror = (e) => {
+                    console.warn("Erreur de synthèse vocale:", e);
+                    speakParts(index + 1);
+                };
+
+                window.speechSynthesis.speak(utterance);
             }
 
-            const utterance = new SpeechSynthesisUtterance(fullText);
-            utterance.lang = 'fr-FR';
-            utterance.rate = 0.95;
-
-            // Chargement explicite des voix disponibles si nécessaire
-            const voices = window.speechSynthesis.getVoices();
-            const frVoice = voices.find(v => v.lang && v.lang.toLowerCase().includes('fr'));
-            if (frVoice) {
-                utterance.voice = frVoice;
+            // S'assurer que les voix sont chargées si nécessaire (Webkit workaround)
+            if (window.speechSynthesis.getVoices().length === 0) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    speakParts(0);
+                };
             }
-
-            window.speechSynthesis.speak(utterance);
+            speakParts(0);
         }
 
         // --- AFFICHAGE DE LA CORRECTION DU CONCOURS ---
@@ -2252,22 +2272,23 @@ Réponse : B..."></textarea>
             tbody.innerHTML = '';
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Aucun élève trouvé pour la classe de ${selectedClass}.</td></tr>`;
-            } else {
-                filtered.forEach((item, idx) => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
-                            <td><strong>${item.lastname}</strong></td>
-                            <td>${item.firstname}</td>
-                            <td>${item.school}</td>
-                            <td>${item.city}</td>
-                            <td><span class="badge badge-class">${item.class}</span></td>
-                            <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
-                        </tr>
-                    `;
-                });
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Aucun élève dans cette classe.</td></tr>`;
+                return;
             }
+
+            filtered.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
+                        <td><strong>${item.lastname}</strong></td>
+                        <td>${item.firstname}</td>
+                        <td>${item.school}</td>
+                        <td>${item.city}</td>
+                        <td><span class="badge badge-class">${item.class}</span></td>
+                        <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
+                    </tr>
+                `;
+            });
         }
 
         async function renderParticipantGlobalRanking() {
@@ -2278,48 +2299,46 @@ Réponse : B..."></textarea>
             tbody.innerHTML = '';
 
             if (sorted.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Aucun élève trouvé.</td></tr>`;
-            } else {
-                sorted.forEach((item, idx) => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
-                            <td><strong>${item.lastname}</strong></td>
-                            <td>${item.firstname}</td>
-                            <td>${item.school}</td>
-                            <td>${item.city}</td>
-                            <td><span class="badge badge-class">${item.class}</span></td>
-                            <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
-                        </tr>
-                    `;
-                });
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Aucun inscrit.</td></tr>`;
+                return;
             }
+
+            sorted.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
+                        <td><strong>${item.lastname}</strong></td>
+                        <td>${item.firstname}</td>
+                        <td>${item.school}</td>
+                        <td>${item.city}</td>
+                        <td><span class="badge badge-class">${item.class}</span></td>
+                        <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
+                    </tr>
+                `;
+            });
         }
 
-        // --- DASHBOARD MES CONCOURS (PARTICIPANT) ---
+        // --- MES CONCOURS & SCORE ---
         async function openMyContestsModal() {
-            if (!currentUserPhone) return;
-
             const results = await DB.getResults();
             const myResults = results.filter(r => r.userPhone === currentUserPhone);
-            
-            const totalPoints = myResults.reduce((sum, r) => sum + r.score, 0);
-            
-            document.getElementById('my-total-points').innerText = totalPoints;
+
+            const totalPts = myResults.reduce((acc, curr) => acc + curr.score, 0);
+            document.getElementById('my-total-points').innerText = totalPts;
             document.getElementById('my-total-count').innerText = myResults.length;
 
             const tbody = document.getElementById('my-contests-table-body');
             tbody.innerHTML = '';
 
             if (myResults.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Vous n'avez participé à aucun concours.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Vous n'avez pas encore effectué de concours.</td></tr>`;
             } else {
-                myResults.forEach((r) => {
+                myResults.forEach(r => {
                     tbody.innerHTML += `
                         <tr>
                             <td><strong>${r.contestTitle}</strong></td>
                             <td><span class="badge badge-class">${r.contestClass || 'N/A'}</span></td>
-                            <td>${r.date || 'Récent'}</td>
+                            <td>${r.date || 'Récemment'}</td>
                             <td><strong style="color:var(--civ-orange);">${r.score} / 10</strong></td>
                             <td><span class="badge badge-online">Complété</span></td>
                         </tr>
@@ -2332,28 +2351,55 @@ Réponse : B..."></textarea>
 
         // --- PROFIL ÉLÈVE ---
         function openProfileModal() {
-            const u = currentUserData || {};
-            document.getElementById('prof-name').innerText = u.name || 'Élève';
-            document.getElementById('prof-lastname').innerText = u.lastname || 'Non renseigné';
-            document.getElementById('prof-firstname').innerText = u.firstname || u.name || 'Non renseigné';
+            const u = currentUserData || { name: "Élève", school: "N/A", class: "N/A", city: "N/A", phone: "N/A", avatar: DEFAULT_AVATAR };
+            
+            document.getElementById('prof-modal-avatar').src = u.avatar || DEFAULT_AVATAR;
+            document.getElementById('prof-name').innerText = u.name;
+            document.getElementById('prof-lastname').innerText = u.lastname || '';
+            document.getElementById('prof-firstname').innerText = u.firstname || u.name;
             document.getElementById('prof-school').innerText = u.school || 'Non renseigné';
             document.getElementById('prof-class').innerText = u.class || 'N/A';
-            document.getElementById('prof-location').innerText = `${u.city || ''}, ${u.country || ''}`;
-            document.getElementById('prof-phone').innerText = u.phone || 'Non renseigné';
-            document.getElementById('prof-modal-avatar').src = u.avatar || DEFAULT_AVATAR;
+            document.getElementById('prof-location').innerText = `${u.city || 'N/A'}, ${u.country || "Côte d'Ivoire"}`;
+            document.getElementById('prof-phone').innerText = u.phone || 'N/A';
 
             const isSub = checkUserSubscription(u);
             const badge = document.getElementById('prof-sub-badge');
-            badge.innerText = isSub ? "Statut : Premium" : "Statut : Gratuit";
-            badge.className = isSub ? "badge badge-paid" : "badge badge-free";
+            badge.innerText = isSub ? "Statut : Premium Actif" : "Statut : Gratuit";
+            badge.style.color = isSub ? "var(--civ-orange)" : "var(--civ-green)";
 
             document.getElementById('modal-profile').classList.add('active');
         }
 
-        function openCreatorModal() {
-            document.getElementById('modal-creator').classList.add('active');
+        // --- ACHAT ABONNEMENT ---
+        function openBuySubscriptionModal() {
+            const u = currentUserData || { name: "", phone: "", class: "3e" };
+            document.getElementById('sub-req-name').value = u.name || '';
+            document.getElementById('sub-req-phone').value = u.phone || '';
+            document.getElementById('sub-req-class').value = u.class || '3e';
+
+            document.getElementById('modal-buy-subscription').classList.add('active');
         }
 
+        async function handleSubscriptionRequest(e) {
+            e.preventDefault();
+            const phone = document.getElementById('sub-req-phone').value.trim();
+            const userClass = document.getElementById('sub-req-class').value;
+
+            const subs = await DB.getSubscriptions();
+            subs.unshift({
+                phone,
+                name: currentUserData?.name || 'Inconnu',
+                class: userClass,
+                status: 'En attente',
+                date: new Date().toLocaleDateString('fr-FR')
+            });
+
+            await DB.saveSubscriptions(subs);
+            closeModal('modal-buy-subscription');
+            showToastGreen("✅ Demande transmise à l'administrateur.");
+        }
+
+        // --- AVIS ÉLÈVE ---
         function openReviewModal() {
             document.getElementById('modal-review').classList.add('active');
         }
@@ -2362,72 +2408,50 @@ Réponse : B..."></textarea>
             currentRating = r;
             const stars = document.getElementById('star-rating-box').children;
             for (let i = 0; i < 5; i++) {
-                stars[i].className = i < r ? 'fa-solid fa-star active' : 'fa-regular fa-star';
                 stars[i].style.color = i < r ? 'var(--civ-orange)' : 'var(--text-sub)';
             }
         }
 
         async function handleReviewSubmit(e) {
             e.preventDefault();
-            const comment = document.getElementById('review-comment').value;
-            const reviews = await DB.getReviews();
-            const u = currentUserData || { name: 'Participant' };
+            const comment = document.getElementById('review-comment').value.trim();
+            const u = currentUserData || { name: "Élève anonyme" };
 
+            const reviews = await DB.getReviews();
             reviews.unshift({
-                userName: u.name,
-                userSchool: u.school || 'Écoles CI',
-                userClass: u.class || 'CE2',
+                name: u.name,
                 rating: currentRating,
-                comment: comment,
+                comment,
                 date: new Date().toLocaleDateString('fr-FR')
             });
 
             await DB.saveReviews(reviews);
             closeModal('modal-review');
-            document.getElementById('review-comment').value = '';
-            showToastGreen("✅ Avis publié avec succès.");
+            showToastGreen("✅ Avis publié avec succès !");
         }
 
-        function openBuySubscriptionModal() {
-            const u = currentUserData || {};
-            document.getElementById('sub-req-name').value = u.name || '';
-            document.getElementById('sub-req-phone').value = u.phone || '';
-            document.getElementById('modal-buy-subscription').classList.add('active');
+        function openCreatorModal() {
+            document.getElementById('modal-creator').classList.add('active');
         }
 
-        async function handleSubscriptionRequest(e) {
+        function copyUniqueLink() {
+            const input = document.getElementById('unique-share-link');
+            input.select();
+            document.execCommand('copy');
+            showToastGreen("📋 Lien unique copié.");
+        }
+
+        // --- ADMINISTRATION ---
+        function handleAdminLogin(e) {
             e.preventDefault();
-            const phone = document.getElementById('sub-req-phone').value;
-            const userClass = document.getElementById('sub-req-class').value;
-
-            const subscriptions = await DB.getSubscriptions();
-            subscriptions.push({
-                phone,
-                name: currentUserData ? currentUserData.name : 'Élève',
-                class: userClass,
-                status: 'En attente',
-                date: new Date().toLocaleDateString('fr-FR')
-            });
-
-            await DB.saveSubscriptions(subscriptions);
-            closeModal('modal-buy-subscription');
-            showToastGreen("✅ Demande envoyée ! Veuillez effectuer le paiement.");
-        }
-
-        // ===================================================================
-        // LOGIQUE ADMINISTRATION
-        // ===================================================================
-
-        async function handleAdminLogin(e) {
-            e.preventDefault();
-            const u = document.getElementById('admin-user').value;
-            const p = document.getElementById('admin-pass').value;
+            const u = document.getElementById('admin-user').value.trim();
+            const p = document.getElementById('admin-pass').value.trim();
 
             if (u === 'ZakariaTV' && p === '55250031') {
-                showToastGreen("✅ Connexion Admin réussie.");
+                showToastGreen("Connexion Administrateur réussie.");
                 showView('admin-dashboard-view');
             } else {
-                alert("Identifiants administration incorrects.");
+                alert("Identifiants incorrects.");
             }
         }
 
@@ -2443,52 +2467,69 @@ Réponse : B..."></textarea>
             document.getElementById('stat-users').innerText = users.length;
             document.getElementById('stat-participations').innerText = results.length;
             document.getElementById('stat-resets').innerText = resets.length;
+
             document.getElementById('users-count-badge').innerText = users.length;
             document.getElementById('reset-badge-count').innerText = resets.length;
             document.getElementById('sub-badge-count').innerText = subs.filter(s => s.status === 'En attente').length;
 
-            const contestList = document.getElementById('admin-contest-list');
-            contestList.innerHTML = '';
-            
+            // Rendu des Concours Admin
+            const list = document.getElementById('admin-contest-list');
+            list.innerHTML = '';
             contests.forEach(c => {
-                contestList.innerHTML += `
+                list.innerHTML += `
                     <div class="contest-card">
-                        <img src="${c.image}" style="width:100%; height:110px; object-fit:cover; border-radius:10px; margin-bottom:8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <img src="${c.image}" alt="${c.title}" style="width:100%; height:100px; object-fit:cover; border-radius:10px; margin-bottom:6px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                             <span class="badge badge-class">${c.level}</span>
-                            <span class="badge ${c.online ? 'badge-online' : 'badge-offline'}">${c.online ? 'En ligne' : 'Masqué'}</span>
+                            <span class="badge ${c.online ? 'badge-online' : 'badge-offline'}">${c.online ? 'En ligne' : 'Hors ligne'}</span>
                         </div>
-                        <div class="contest-title">${c.title}</div>
+                        <strong style="font-size:0.85rem;">${c.title}</strong>
                         <div style="display:flex; gap:6px; margin-top:8px;">
-                            <button class="btn btn-secondary" style="flex:1; padding:4px;" onclick="toggleContestStatus(${c.id})">${c.online ? 'Masquer' : 'Publier'}</button>
-                            <button class="btn btn-danger" style="padding:4px 10px;" onclick="deleteContest(${c.id})"><i class="fa-solid fa-trash"></i></button>
+                            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="toggleContestOnline(${c.id})">
+                                ${c.online ? 'Masquer' : 'Publier'}
+                            </button>
+                            <button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteContest(${c.id})">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </div>
                     </div>
                 `;
             });
 
-            const reviewContainer = document.getElementById('admin-reviews-list');
-            reviewContainer.innerHTML = '';
+            // Rendu des Avis Admin
+            const revList = document.getElementById('admin-reviews-list');
+            revList.innerHTML = '';
             if (reviews.length === 0) {
-                reviewContainer.innerHTML = `<p style="font-size:0.8rem; color:var(--text-sub);">Aucun avis posté.</p>`;
+                revList.innerHTML = `<p style="color:var(--text-sub); font-size:0.8rem;">Aucun avis pour le moment.</p>`;
             } else {
                 reviews.forEach(r => {
-                    reviewContainer.innerHTML += `
-                        <div style="background:var(--card-alt); padding:8px 12px; border-radius:8px; margin-bottom:6px; font-size:0.8rem; border:1px solid var(--border);">
-                            <div style="display:flex; justify-content:space-between; color:var(--civ-orange); font-weight:700;">
-                                <span>${r.userName} (${r.userSchool || 'Éléve'})</span>
-                                <span>${r.date || ''}</span>
+                    revList.innerHTML += `
+                        <div style="background:var(--card-alt); border-bottom:1px solid var(--border); padding:8px; margin-bottom:4px; border-radius:6px; font-size:0.8rem;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong>${r.name}</strong>
+                                <span style="color:var(--civ-orange);">${'★'.repeat(r.rating)}</span>
                             </div>
-                            <p style="color:#FFF; margin-top:2px;">${r.comment}</p>
+                            <p style="color:var(--text-sub); margin-top:2px;">${r.comment}</p>
+                            <div style="font-size:0.68rem; color:var(--text-sub); text-align:right;">${r.date || 'Récemment'}</div>
                         </div>
                     `;
                 });
             }
         }
 
-        async function toggleContestStatus(id) {
+        function openCreateContestModal() {
+            document.getElementById('edit-contest-id').value = '';
+            document.getElementById('edit-title').value = '';
+            document.getElementById('edit-image').value = 'https://images.unsplash.com/photo-1447069387593-a5de0862481e?w=500&q=80';
+            document.getElementById('edit-questions-raw').value = '';
+            document.getElementById('parse-feedback').innerHTML = '';
+            document.getElementById('modal-contest-title').innerText = "Créer un Concours (Analyse Automatique)";
+            document.getElementById('modal-edit-contest').classList.add('active');
+        }
+
+        async function toggleContestOnline(id) {
             const contests = await DB.getContests();
-            const c = contests.find(item => item.id === id);
+            const c = contests.find(item => item.id == id);
             if (c) {
                 c.online = !c.online;
                 await DB.saveContests(contests);
@@ -2497,54 +2538,43 @@ Réponse : B..."></textarea>
         }
 
         async function deleteContest(id) {
-            if (confirm("Supprimer ce concours ?")) {
+            if (confirm("Voulez-vous supprimer ce concours ?")) {
                 let contests = await DB.getContests();
-                contests = contests.filter(c => c.id !== id);
+                contests = contests.filter(item => item.id != id);
                 await DB.saveContests(contests);
                 renderAdminDashboard();
+                showToastGreen("Concours supprimé.");
             }
-        }
-
-        function openCreateContestModal() {
-            document.getElementById('edit-contest-id').value = '';
-            document.getElementById('edit-title').value = '';
-            document.getElementById('edit-questions-raw').value = '';
-            document.getElementById('parse-feedback').innerHTML = '';
-            updateLevelOptions();
-            document.getElementById('modal-edit-contest').classList.add('active');
-        }
-
-        function copyUniqueLink() {
-            const input = document.getElementById('unique-share-link');
-            input.select();
-            document.execCommand('copy');
-            showToastGreen("✅ Lien copié dans le presse-papier.");
         }
 
         async function resetAllData() {
-            if (confirm("⚠️ ATTENTION : Voulez-vous vraiment réinitialiser toutes les données (résultats, avis, abonnements) ?")) {
-                await database.ref('results').remove();
-                await database.ref('reviews').remove();
-                await database.ref('resets').remove();
-                await database.ref('subscriptions').remove();
-                showToastGreen("✅ Données réinitialisées.");
+            if (confirm("⚠️ ATTENTION : Cela réinitialisera l'ensemble des concours, résultats et demandes. Êtes-vous sûr ?")) {
+                await DB.saveContests([]);
+                await DB.saveResults([]);
+                await DB.saveResets([]);
+                await DB.saveSubscriptions([]);
+                await DB.saveReviews([]);
                 renderAdminDashboard();
+                showToastGreen("Toutes les données de l'application ont été réinitialisées.");
             }
         }
 
-        // --- MODALES D'ADMINISTRATION ---
+        // MODALES ADMINISTRATEUR
         async function openAdminUsersModal() {
             const users = await DB.getUsers();
             const tbody = document.getElementById('admin-users-table');
             tbody.innerHTML = '';
+
             users.forEach(u => {
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>${u.name}</strong></td>
                         <td>${u.school || 'N/A'} (${u.class || 'N/A'})</td>
                         <td>${u.city || 'N/A'}</td>
-                        <td>${u.phone}</td>
-                        <td><button class="btn btn-danger" style="padding:2px 8px; font-size:0.7rem;" onclick="deleteUser('${u.uid}')">Supprimer</button></td>
+                        <td>${u.phone || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteUser('${u.uid}')">Supprimer</button>
+                        </td>
                     </tr>
                 `;
             });
@@ -2552,7 +2582,7 @@ Réponse : B..."></textarea>
         }
 
         async function deleteUser(uid) {
-            if (confirm("Supprimer ce compte participant ?")) {
+            if (confirm("Supprimer cet utilisateur ?")) {
                 await database.ref('users/' + uid).remove();
                 openAdminUsersModal();
                 renderAdminDashboard();
@@ -2563,6 +2593,7 @@ Réponse : B..."></textarea>
             const results = await DB.getResults();
             const tbody = document.getElementById('admin-results-table');
             tbody.innerHTML = '';
+
             results.forEach(r => {
                 tbody.innerHTML += `
                     <tr>
@@ -2579,20 +2610,20 @@ Réponse : B..."></textarea>
 
         async function openAdminResetsModal() {
             const resets = await DB.getResets();
-            const container = document.getElementById('admin-resets-list');
-            container.innerHTML = '';
+            const list = document.getElementById('admin-resets-list');
+            list.innerHTML = '';
 
             if (resets.length === 0) {
-                container.innerHTML = `<p style="font-size:0.8rem; color:var(--text-sub);">Aucune demande en attente.</p>`;
+                list.innerHTML = `<p style="color:var(--text-sub); font-size:0.8rem;">Aucune demande de réinitialisation.</p>`;
             } else {
                 resets.forEach((r, idx) => {
-                    container.innerHTML += `
-                        <div style="background:var(--card-alt); padding:10px; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    list.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-alt); padding:8px 12px; border-radius:8px; margin-bottom:6px; border:1px solid var(--border);">
                             <div>
                                 <strong>${r.name}</strong> (${r.phone})
-                                <div style="font-size:0.75rem; color:var(--text-sub);">Demandé le : ${r.date}</div>
+                                <div style="font-size:0.7rem; color:var(--text-sub);">${r.date}</div>
                             </div>
-                            <button class="btn btn-green" style="padding:4px 10px; font-size:0.75rem;" onclick="processResetPassword(${idx})">Réinitialiser (5555)</button>
+                            <button class="btn btn-orange" style="padding:4px 8px; font-size:0.75rem;" onclick="processResetPass(${idx}, '${r.phone}')">Réinitialiser Mdp (5555)</button>
                         </div>
                     `;
                 });
@@ -2600,21 +2631,13 @@ Réponse : B..."></textarea>
             document.getElementById('modal-admin-resets').classList.add('active');
         }
 
-        async function processResetPassword(idx) {
+        async function processResetPass(idx, phone) {
+            alert(`Le mot de passe pour ${phone} a été réinitialisé par défaut à "5555".`);
             let resets = await DB.getResets();
-            const resetReq = resets[idx];
-            
-            const users = await DB.getUsers();
-            const u = users.find(user => user.phone === resetReq.phone);
-
-            if (u) {
-                // Dans Firebase Auth v8, pour changer le mdp d'un tiers sans son jeton admin, on valide la requête côté dashboard.
-                alert(`Pour valider la réinitialisation de ${u.name}, communiquez-lui le mot de passe temporaire : 5555`);
-                resets.splice(idx, 1);
-                await DB.saveResets(resets);
-                openAdminResetsModal();
-                renderAdminDashboard();
-            }
+            resets.splice(idx, 1);
+            await DB.saveResets(resets);
+            openAdminResetsModal();
+            renderAdminDashboard();
         }
 
         async function openAdminSubscriptionModal() {
@@ -2622,54 +2645,45 @@ Réponse : B..."></textarea>
             const tbody = document.getElementById('admin-subscriptions-table');
             tbody.innerHTML = '';
 
-            if (subs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Aucun abonnement enregistré.</td></tr>`;
-            } else {
-                subs.forEach((s, idx) => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${s.name}</strong></td>
-                            <td>${s.phone}</td>
-                            <td><span class="badge badge-class">${s.class}</span></td>
-                            <td><span class="badge ${s.status === 'Actif' ? 'badge-online' : 'badge-paid'}">${s.status}</span></td>
-                            <td>
-                                ${s.status === 'En attente' ? `<button class="btn btn-green" style="padding:2px 8px; font-size:0.7rem;" onclick="activateSubscription('${s.phone}', ${idx})">Activer 30 jours</button>` : 'Actif'}
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
+            subs.forEach((s, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${s.name}</strong></td>
+                        <td>${s.phone}</td>
+                        <td><span class="badge badge-class">${s.class}</span></td>
+                        <td><span class="badge ${s.status === 'Actif' ? 'badge-online' : 'badge-paid'}">${s.status}</span></td>
+                        <td>
+                            ${s.status === 'En attente' ? `<button class="btn btn-green" style="padding:2px 8px; font-size:0.7rem;" onclick="activateSub(${idx}, '${s.phone}')">Valider Abonnement</button>` : 'Validé'}
+                        </td>
+                    </tr>
+                `;
+            });
             document.getElementById('modal-admin-subscription').classList.add('active');
         }
 
-        async function activateSubscription(phone, subIdx) {
+        async function activateSub(idx, phone) {
+            const subs = await DB.getSubscriptions();
+            subs[idx].status = 'Actif';
+            await DB.saveSubscriptions(subs);
+
+            // Activation dans la base utilisateur Firebase
             const users = await DB.getUsers();
-            const user = users.find(u => u.phone === phone);
-
-            if (user) {
+            const targetUser = users.find(u => u.phone === phone);
+            if (targetUser && targetUser.uid) {
                 const expiresAt = new Date();
-                expiresAt.setDate(expiresAt.getDate() + 30);
-
-                await database.ref(`users/${user.uid}/subscription`).set({
+                expiresAt.setMonth(expiresAt.getMonth() + 1);
+                await database.ref('users/' + targetUser.uid + '/subscription').set({
                     active: true,
                     expiresAt: expiresAt.toISOString()
                 });
-
-                let subs = await DB.getSubscriptions();
-                if (subs[subIdx]) {
-                    subs[subIdx].status = 'Actif';
-                    await DB.saveSubscriptions(subs);
-                }
-
-                showToastGreen("✅ Abonnement activé pour 30 jours.");
-                openAdminSubscriptionModal();
-                renderAdminDashboard();
-            } else {
-                alert("Utilisateur non trouvé.");
             }
+
+            openAdminSubscriptionModal();
+            renderAdminDashboard();
+            showToastGreen("Abonnement activé pour 1 mois.");
         }
 
-        // --- CLASSEMENTS ADMIN ---
+        // --- TOP 10 & CLASSEMENT GÉNÉRAL ADMIN ---
         async function openTop10ModalAdmin() {
             const stats = await computeUserAggregatedStats();
             const sorted = stats.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 10);
@@ -2693,7 +2707,6 @@ Réponse : B..."></textarea>
                     </tr>
                 `;
             });
-
             document.getElementById('modal-admin-top10').classList.add('active');
         }
 
@@ -2708,7 +2721,7 @@ Réponse : B..."></textarea>
             currentAdminRankMode = mode;
             document.getElementById('btn-admin-rank-mode-level').className = mode === 'level' ? 'btn btn-secondary active' : 'btn btn-secondary';
             document.getElementById('btn-admin-rank-mode-global').className = mode === 'global' ? 'btn btn-secondary active' : 'btn btn-secondary';
-            
+
             document.getElementById('admin-ranking-level-select-box').style.display = mode === 'level' ? 'block' : 'none';
 
             if (mode === 'level') {
@@ -2725,6 +2738,11 @@ Réponse : B..."></textarea>
 
             const tbody = document.getElementById('admin-general-ranking-table-body');
             tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Aucun élève enregistré dans cette classe.</td></tr>`;
+                return;
+            }
 
             filtered.forEach((item, idx) => {
                 const avg = item.totalContests > 0 ? (item.totalPoints / item.totalContests).toFixed(1) : '0';
