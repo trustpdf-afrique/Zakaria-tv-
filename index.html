@@ -591,4 +591,1501 @@
       text-align: center;
       margin: 14px 0;
       gap: 10px;
-    
+    }
+
+    .cert-student-photo {
+      width: 85px;
+      height: 85px;
+      border-radius: 50%;
+      border: 3.5px solid #D97706;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      background: #FFF;
+    }
+
+    .cert-student-fullname {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #0F172A;
+      text-transform: uppercase;
+    }
+
+    .cert-detail-line {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .cert-badge-box {
+      background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+      border: 1.5px solid #F59E0B;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      justify-style: space-around;
+      align-items: center;
+      margin: 14px 0;
+      width: 100%;
+    }
+
+    .cert-badge-lbl {
+      font-size: 9px;
+      font-weight: 800;
+      color: #92400E;
+      text-transform: uppercase;
+    }
+
+    .cert-badge-val {
+      font-size: 18px;
+      font-weight: 900;
+      color: #78350F;
+    }
+
+    .cert-badge-mention {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--green-ztv);
+    }
+
+    .cert-footer-portrait {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 16px;
+      padding-top: 10px;
+      border-top: 1px dashed #CBD5E1;
+    }
+
+    .cert-signature-title {
+      font-size: 9px;
+      font-weight: 800;
+      color: #64748B;
+      text-transform: uppercase;
+    }
+
+    .cert-signature-font {
+      font-family: 'Great Vibes', cursive;
+      font-size: 20px;
+      color: #0F172A;
+      font-weight: bold;
+    }
+
+    .btn-print-cert {
+      background: linear-gradient(135deg, var(--orange-ztv), #D96B00);
+      color: #FFF;
+      font-weight: 800;
+      font-size: 14px;
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 14px 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: var(--glow-orange);
+      margin: 16px auto 0;
+      width: calc(100% - 32px);
+      transition: var(--transition);
+    }
+    .btn-print-cert:active { transform: scale(0.96); }
+
+    /* RÈGLES SPÉCIALES D'IMPRESSION VERTICALE / PORTRAIT STRICTE */
+    @media print {
+      @page { size: portrait; margin: 10mm; }
+      body { background: #FFF !important; display: block !important; }
+      .app-frame { max-width: 100% !important; height: auto !important; max-height: none !important; box-shadow: none !important; border: none !important; background: #FFF !important; }
+      .page-view { display: none !important; }
+      #view-certif { display: block !important; padding: 0 !important; }
+      .certif-selector-bar, .btn-print-cert, .btn-back-link, .dash-header, .whatsapp-float-btn { display: none !important; }
+      .portrait-cert-wrapper { padding: 0 !important; width: 100% !important; }
+      .certificate-portrait-frame { width: 100% !important; max-width: none !important; box-shadow: none !important; border-width: 8px !important; page-break-inside: avoid; }
+    }
+
+    /* MODALE POPUP ELEGANTE */
+    .modal-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 6, 13, 0.88); backdrop-filter: blur(8px);
+      z-index: 1050; display: none; align-items: center; justify-content: center; padding: 20px;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+      background: var(--bg-card); border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-xl); padding: 22px; width: 100%; max-width: 360px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; }
+    .modal-title { font-size: 15px; font-weight: 800; color: #FFF; display: flex; align-items: center; gap: 8px; }
+    .modal-close-btn {
+      background: var(--bg-input); border: 1px solid var(--border-light);
+      color: var(--text-gray); width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer;
+    }
+
+    /* PHOTO CRÉATEUR MODALE */
+    .creator-photo-ring {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px solid var(--orange-ztv);
+      box-shadow: 0 0 15px rgba(255, 140, 0, 0.6);
+      object-fit: cover;
+      margin: 0 auto 12px auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CHÂSSIS APPLICATION -->
+  <div class="app-frame">
+
+    <!-- ================= 1. PAGE D'AUTHENTIFICATION ZTV MOYENNE ================= -->
+    <div id="view-auth" class="page-view active">
+      
+      <div class="auth-header">
+        <img src="https://i.postimg.cc/HjDJvjqX/file-00000000685081f4afaf53efdfb26e58.png" alt="ZTV Moyenne Logo" class="ztv-logo-brand" />
+        <button class="btn-creator-top" onclick="openModalCreator()">
+          <span style="color:var(--orange-ztv); font-size:14px;">👑</span>
+          <span>Créateur de l'application</span>
+        </button>
+      </div>
+
+      <div class="header-divider-line"></div>
+
+      <div class="presentation-card">
+        <img src="https://i.postimg.cc/HjDJvjqX/file-00000000685081f4afaf53efdfb26e58.png" alt="ZTV Moyenne Logo" class="presentation-logo" />
+        <div>
+          <div class="presentation-title">ZTV Moyenne</div>
+          <div class="presentation-subtitle">ZTV Moyenne permet aux élèves de calculer facilement leur moyenne du 1er, 2e et 3e trimestre, ainsi que leur moyenne annuelle. Il suffit de saisir ses moyennes pour obtenir rapidement ses résultats.</div>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="tab-btn active" id="tab-login-btn" onclick="switchAuthTab('login')">Se connecter</button>
+          <button class="tab-btn" id="tab-register-btn" onclick="switchAuthTab('register')">S'inscrire</button>
+        </div>
+
+        <!-- FORMULAIRE SE CONNECTER -->
+        <div id="form-login-content">
+          <div class="form-group">
+            <input type="text" class="form-input" id="login-fullname" placeholder="Nom complet" />
+          </div>
+
+          <div class="form-group">
+            <input type="password" class="form-input" id="login-pass" placeholder="Mot de passe" />
+          </div>
+
+          <button class="btn-main-green" onclick="actionLogin()">
+            <span>Accéder à mon espace</span>
+            <span>➔</span>
+          </button>
+
+          <div class="auth-error-msg" id="login-error-msg">
+            Vos informations sont incorrectes. Veuillez vérifier vos informations et réessayer.
+          </div>
+
+          <a href="#" class="forgot-link" onclick="openModal('Mot de passe', '<p style=\'font-size:12px; color:#9CA3AF;\'>Veuillez contacter l\'administration ou le support WhatsApp pour réinitialiser vos accès.</p>')">Mot de passe oublié ?</a>
+        </div>
+
+        <!-- FORMULAIRE S'INSCRIRE -->
+        <div id="form-register-content" style="display:none;">
+          <div class="form-grid-dual">
+            <div class="form-group"><input type="text" class="form-input" id="reg-nom" placeholder="Nom" /></div>
+            <div class="form-group"><input type="text" class="form-input" id="reg-prenom" placeholder="Prénom" /></div>
+          </div>
+
+          <div class="form-grid-dual">
+            <div class="form-group"><input type="text" class="form-input" id="reg-ville" placeholder="Ville" /></div>
+            <div class="form-group">
+              <select class="form-input" id="reg-pays">
+                <option value="Côte d'Ivoire">Côte d'Ivoire 🇨🇮</option>
+                <option value="Bénin">Bénin 🇧🇯</option>
+                <option value="Burkina Faso">Burkina Faso 🇧🇫</option>
+                <option value="Sénégal">Sénégal 🇸🇳</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <input type="text" class="form-input" id="reg-etablissement" placeholder="Établissement scolaire" />
+          </div>
+
+          <div class="form-group">
+            <select class="form-input" id="reg-classe" onchange="checkClasse3emeUI()">
+              <option value="">Sélectionnez votre classe...</option>
+              <option value="6ème">6ème</option>
+              <option value="5ème">5ème</option>
+              <option value="4ème">4ème</option>
+              <option value="3ème">3ème</option>
+              <option value="Seconde">Seconde</option>
+              <option value="Première">Première</option>
+              <option value="Terminale">Terminale</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <input type="tel" class="form-input" id="reg-whatsapp" placeholder="Numéro WhatsApp" />
+          </div>
+
+          <!-- SELECTION PHOTO GALERIE -->
+          <div class="form-group">
+            <label for="reg-photo-file" class="btn-photo-gallery">
+              <span>📷 Ajouter ma photo depuis la galerie</span>
+            </label>
+            <input type="file" id="reg-photo-file" accept="image/*" style="display:none;" onchange="handlePhotoSelect(event)" />
+            <div id="photo-preview-msg" style="font-size:11px; color:var(--green-ztv); margin-top:6px; text-align:center; font-weight:700;"></div>
+          </div>
+
+          <div class="form-group">
+            <input type="password" class="form-input" id="reg-pass" placeholder="Mot de passe" />
+          </div>
+
+          <button class="btn-main-green" onclick="actionRegister()">
+            <span>Créer mon compte</span>
+            <span>✓</span>
+          </button>
+
+          <div class="auth-error-msg" id="reg-error-msg">
+            Ces informations ont déjà un compte actif. Veuillez vous connecter.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= 2. TABLEAU DE BORD (DASHBOARD) ================= -->
+    <div id="view-dashboard" class="page-view">
+      <div class="dash-header">
+        <div class="user-profile-info">
+          <img src="https://i.postimg.cc/Z5t6ctQQ/file-000000008a6081f9a7552dfe57d5c70d.png" class="user-avatar-circle" id="dash-avatar-img" />
+          <div>
+            <div style="font-size: 11px; color: var(--text-gray);">Bonjour,</div>
+            <div style="font-size: 15px; font-weight: 800;" id="dash-user-name">Élève ZTV 👋</div>
+          </div>
+        </div>
+        <img src="https://i.postimg.cc/HjDJvjqX/file-00000000685081f4afaf53efdfb26e58.png" alt="ZTV Moyenne Logo" style="height: 36px; width: auto;" />
+      </div>
+
+      <!-- DISPOSITION EXACTE DES 3 TRIMESTRES -->
+      <div class="trimestres-section">
+        <div class="trimestres-row-top">
+          <!-- 1er TRIMESTRE -->
+          <div class="trim-card trim-card-1" onclick="openTrimPage(1)">
+            <div class="trim-header-flex">
+              <div class="trim-title-box">
+                <span style="font-size:15px;">📚</span>
+                <span class="trim-title">1er TRIMESTRE</span>
+              </div>
+              <div class="trim-arrow-circle">→</div>
+            </div>
+            <div class="trim-sublbl">Moyenne</div>
+            <div class="trim-val" id="val-t1">-- /20</div>
+          </div>
+
+          <!-- 2e TRIMESTRE -->
+          <div class="trim-card trim-card-2" onclick="openTrimPage(2)">
+            <div class="trim-header-flex">
+              <div class="trim-title-box">
+                <span style="font-size:15px;">📚</span>
+                <span class="trim-title">2e TRIMESTRE</span>
+              </div>
+              <div class="trim-arrow-circle">→</div>
+            </div>
+            <div class="trim-sublbl">Moyenne</div>
+            <div class="trim-val" id="val-t2">-- /20</div>
+          </div>
+        </div>
+
+        <!-- 3e TRIMESTRE -->
+        <div class="trimestres-row-bottom">
+          <div class="trim-card trim-card-3" onclick="openTrimPage(3)">
+            <div class="trim-header-flex">
+              <div class="trim-title-box">
+                <span style="font-size:15px;">📚</span>
+                <span class="trim-title">3e TRIMESTRE</span>
+              </div>
+              <div class="trim-arrow-circle">→</div>
+            </div>
+            <div class="trim-sublbl">Moyenne</div>
+            <div class="trim-val" id="val-t3">-- /20</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARTE MOYENNE D'ORIENTATION (RÉSERVÉE AUX ÉLÈVES DE 3EME) -->
+      <div id="card-orientation-3eme-wrapper" style="display:none;">
+        <div class="orientation-card-3eme" onclick="switchPage('view-orientation')">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:28px;">🎯</span>
+            <div>
+              <div style="font-size:13px; font-weight:900;">Moyenne d'orientation</div>
+              <div style="font-size:10px; color:#A5B4FC; margin-top:2px;">Calculer ma moyenne d'orientation (3ᵉ)</div>
+            </div>
+          </div>
+          <div style="font-size:16px;">➔</div>
+        </div>
+      </div>
+
+      <!-- Moyenne Annuelle -->
+      <div class="annual-card-ztv">
+        <div class="annual-top-title">🎓 Moyenne Annuelle</div>
+        <div class="annual-stats-grid">
+          <div>
+            <div class="annual-stat-lbl">Moyenne</div>
+            <div class="annual-stat-val" id="val-annual" style="color:var(--orange-ztv);">-- /20</div>
+          </div>
+          <div>
+            <div class="annual-stat-lbl">Mention</div>
+            <div class="annual-stat-val" id="val-mention" style="color:var(--text-gray); font-size:13px; margin-top:4px;">--</div>
+          </div>
+          <div>
+            <div class="annual-stat-lbl">Décision</div>
+            <div class="annual-stat-val" id="val-decision" style="color:var(--text-gray); font-size:12px; margin-top:6px;">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progression -->
+      <div class="progression-card-ztv">
+        <div class="prog-circle" id="circle-pct">0/20</div>
+        <div style="flex:1;">
+          <div style="font-size: 12px; font-weight: 800; text-transform: uppercase;">Progression Générale</div>
+          <div style="font-size: 11px; color: #64748B; margin-top:2px;" id="prog-desc">Renseignez vos moyennes par trimestre</div>
+          <div class="prog-bar-bg"><div class="prog-bar-fill" id="bar-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- Objectif -->
+      <div class="objective-banner" onclick="openModalObjectif()">
+        <div>
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase;">🎯 Objectif : Passer en classe supérieure</div>
+          <div style="font-size: 9px; opacity: 0.9;">Voir les détails et conseils personnalisés</div>
+        </div>
+        <div style="font-size:14px;">➔</div>
+      </div>
+
+      <!-- BOUTONS PASTILLES MON PROFIL PUIS TABLEAU D'HONNEUR -->
+      <div class="bottom-dual-btns">
+        <div class="btn-pill-premium btn-pill-premium-green" onclick="switchPage('view-profile')">
+          <div class="pill-icon-circle" style="color:var(--green-ztv);">👤</div>
+          <div>
+            <div style="font-size:12px; font-weight:900; color:#10B981;">MON PROFIL</div>
+            <div style="font-size:9.5px; color:var(--text-gray);">Voir et gérer mon compte</div>
+          </div>
+        </div>
+
+        <div class="btn-pill-premium" onclick="ouvrirTableauHonneurAccueil()">
+          <div class="pill-icon-circle">🏆</div>
+          <div>
+            <div style="font-size:12px; font-weight:900; color:#F59E0B;">TABLEAU D'HONNEUR</div>
+            <div style="font-size:9.5px; color:var(--text-gray);">Voir mon tableau d'honneur</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= 3. PAGE SAISIE DE TRIMESTRE ================= -->
+    <div id="view-trim-entry" class="page-view">
+      <div class="bulletin-container">
+        <div class="bulletin-header-top">
+          <button class="btn-back-link" onclick="switchPage('view-dashboard')">⬅️ Retour au tableau de bord</button>
+          <img src="https://i.postimg.cc/HjDJvjqX/file-00000000685081f4afaf53efdfb26e58.png" style="height:32px;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <h2 style="font-size:16px; font-weight:800;" id="trim-entry-title">Saisie des Moyennes - 1er Trimestre</h2>
+          <p style="font-size:11px; color:var(--text-gray);">Renseignez vos coefficients et vos moyennes par discipline.</p>
+        </div>
+
+        <table class="bulletin-table" id="bulletin">
+          <thead>
+            <tr>
+              <th>Discipline</th>
+              <th>Coef.</th>
+              <th>Moyenne</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- LETTRES -->
+            <tr class="section-title-row"><td colspan="4">--- LETTRES ---</td></tr>
+            <tr data-subject="Français">
+              <td>Français</td>
+              <td><input type="number" class="inp-coef" value="3" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="Anglais">
+              <td>Anglais</td>
+              <td><input type="number" class="inp-coef" value="2" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="Espagnol">
+              <td>Espagnol</td>
+              <td><input type="number" class="inp-coef" value="2" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="Allemand">
+              <td>Allemand</td>
+              <td><input type="number" class="inp-coef" value="2" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="Histoire - Géographie">
+              <td>Histoire - Géographie</td>
+              <td><input type="number" class="inp-coef" value="2" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+
+            <!-- SCIENCES -->
+            <tr class="section-title-row"><td colspan="4">--- SCIENCES ---</td></tr>
+            <tr data-subject="Mathématiques">
+              <td>Mathématiques</td>
+              <td><input type="number" class="inp-coef" value="3" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="Physique - Chimie">
+              <td>Physique - Chimie</td>
+              <td><input type="number" class="inp-coef" value="2" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="SVT">
+              <td>SVT</td>
+              <td><input type="number" class="inp-coef" value="2" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+
+            <!-- AUTRES MATIÈRES -->
+            <tr class="section-title-row"><td colspan="4">--- AUTRES MATIÈRES ---</td></tr>
+            <tr data-subject="Philosophie">
+              <td>Philosophie</td>
+              <td><input type="number" class="inp-coef" value="2" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="EDHC">
+              <td>EDHC</td>
+              <td><input type="number" class="inp-coef" value="1" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="EPS">
+              <td>EPS</td>
+              <td><input type="number" class="inp-coef" value="1" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+            <tr data-subject="Arts plastiques">
+              <td>Arts plastiques</td>
+              <td><input type="number" class="inp-coef" value="1" oninput="calculerBulletin()" /></td>
+              <td><input type="number" min="0" max="20" step="0.25" class="inp-note" oninput="calculerBulletin()" /></td>
+              <td class="tot-cell">-</td>
+            </tr>
+
+            <!-- SUMMARY -->
+            <tr class="summary-row">
+              <td colspan="2">Total Général</td>
+              <td id="total-coefs">0</td>
+              <td id="total-points">0.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button class="btn-main-green" onclick="enregistrerPageTrimestre()">💾 ENREGISTRER ET REVENIR</button>
+      </div>
+    </div>
+
+    <!-- ================= 4. PAGE MON PROFIL ================= -->
+    <div id="view-profile" class="page-view">
+      <div style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn-back-link" onclick="switchPage('view-dashboard')">⬅️ Retour</button>
+        <button class="btn-back-link" style="border-color:var(--orange-ztv); color:var(--orange-ztv);" onclick="openModalCreator()">👑 Créateur</button>
+      </div>
+
+      <div style="text-align:center;">
+        <h2 style="font-size: 18px; font-weight: 800;">👤 MON PROFIL ÉLÈVE</h2>
+        <p style="font-size: 11px; color: var(--text-gray);">Voir et gérer mon compte</p>
+      </div>
+
+      <div class="profile-card-box">
+        <img src="https://i.postimg.cc/Z5t6ctQQ/file-000000008a6081f9a7552dfe57d5c70d.png" class="profile-avatar-large" id="profile-avatar-img" />
+        <h3 style="font-size: 18px; font-weight: 800;" id="prof-disp-fullname">Nom & Prénom</h3>
+        <p style="font-size: 12px; color: var(--green-ztv); font-weight: 700; margin-top:2px;" id="prof-disp-role">Élève Connecté(e)</p>
+
+        <div class="profile-field-list">
+          <div class="profile-field-item">
+            <span class="profile-field-label">Nom</span>
+            <span class="profile-field-value" id="prof-nom">--</span>
+          </div>
+          <div class="profile-field-item">
+            <span class="profile-field-label">Prénom</span>
+            <span class="profile-field-value" id="prof-prenom">--</span>
+          </div>
+          <div class="profile-field-item">
+            <span class="profile-field-label">Établissement</span>
+            <span class="profile-field-value" id="prof-etablissement">--</span>
+          </div>
+          <div class="profile-field-item">
+            <span class="profile-field-label">Classe</span>
+            <span class="profile-field-value" id="prof-classe">--</span>
+          </div>
+          <div class="profile-field-item">
+            <span class="profile-field-label">Ville</span>
+            <span class="profile-field-value" id="prof-ville">--</span>
+          </div>
+          <div class="profile-field-item">
+            <span class="profile-field-label">Pays</span>
+            <span class="profile-field-value" id="prof-pays">Côte d'Ivoire 🇨🇮</span>
+          </div>
+          <div class="profile-field-item">
+            <span class="profile-field-label">WhatsApp</span>
+            <span class="profile-field-value" id="prof-whatsapp">--</span>
+          </div>
+          <div class="profile-field-item">
+            <span class="profile-field-label">Création du compte</span>
+            <span class="profile-field-value" id="prof-created-date">--</span>
+          </div>
+        </div>
+
+        <div style="margin-top:18px; text-align:left;">
+          <h4 style="font-size:12px; font-weight:800; color:var(--orange-ztv); margin-bottom:10px;">📊 RÉSUMÉ DES RÉSULTATS</h4>
+          <div class="profile-field-list">
+            <div class="profile-field-item">
+              <span class="profile-field-label">1er Trimestre</span>
+              <span class="profile-field-value" id="prof-t1-val">-- /20</span>
+            </div>
+            <div class="profile-field-item">
+              <span class="profile-field-label">2e Trimestre</span>
+              <span class="profile-field-value" id="prof-t2-val">-- /20</span>
+            </div>
+            <div class="profile-field-item">
+              <span class="profile-field-label">3e Trimestre</span>
+              <span class="profile-field-value" id="prof-t3-val">-- /20</span>
+            </div>
+            <div class="profile-field-item">
+              <span class="profile-field-label">Moyenne Annuelle</span>
+              <span class="profile-field-value" id="prof-annuel-val" style="color:var(--orange-ztv);">-- /20</span>
+            </div>
+            <div class="profile-field-item">
+              <span class="profile-field-label">Mention Annuelle</span>
+              <span class="profile-field-value" id="prof-mention-val">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+          <button class="btn-photo-gallery" onclick="triggerPhotoChange()">📷 Modifier ma photo</button>
+          <button class="btn-main-green" style="background:#EF4444; box-shadow:none;" onclick="actionLogout()">🔒 Se déconnecter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 5. PAGE CERTIFICAT TABLEAU D'HONNEUR (FORMAT PORTRAIT VERTICAL) ================= -->
+    <div id="view-certif" class="page-view">
+      <div style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn-back-link" onclick="switchPage('view-dashboard')">⬅️ Retour</button>
+        <span style="font-size:12px; font-weight:800; color:var(--orange-ztv);">🎓 TABLEAU D'HONNEUR</span>
+      </div>
+
+      <!-- ONGLETS PAR PERIODE -->
+      <div class="certif-selector-bar">
+        <button class="certif-tab-btn active" id="cert-tab-annuel" onclick="changeCertifPeriod('annuel')">🏆 Tableau d'honneur Annuel</button>
+        <button class="certif-tab-btn" id="cert-tab-t1" onclick="changeCertifPeriod('t1')">🏆 1er Trimestre</button>
+        <button class="certif-tab-btn" id="cert-tab-t2" onclick="changeCertifPeriod('t2')">🏆 2e Trimestre</button>
+        <button class="certif-tab-btn" id="cert-tab-t3" onclick="changeCertifPeriod('t3')">🏆 3e Trimestre</button>
+      </div>
+
+      <!-- CERTIFICAT FORMAT VERTICAL PORTRAIT PREMIUM -->
+      <div class="portrait-cert-wrapper">
+        <div class="certificate-portrait-frame">
+          <div class="cert-inner-border">
+            
+            <div class="cert-header-vertical">
+              <img src="https://i.postimg.cc/HjDJvjqX/file-00000000685081f4afaf53efdfb26e58.png" class="cert-header-logo" alt="Logo ZTV Moyenne" />
+              <div>
+                <div class="cert-title-portrait">🏆 TABLEAU D'HONNEUR</div>
+                <div class="cert-subtitle-gold">ACADÉMIE ZTV EXCELLENCE</div>
+              </div>
+              <div style="font-size:24px;">🎖️</div>
+            </div>
+
+            <div class="cert-body-vertical">
+              <img src="https://i.postimg.cc/Z5t6ctQQ/file-000000008a6081f9a7552dfe57d5c70d.png" class="cert-student-photo" id="cert-photo-img" />
+              <div>
+                <div style="font-size:9.5px; font-weight:800; color:#D97706; text-transform:uppercase;">Félicitations à :</div>
+                <div class="cert-student-fullname" id="cert-fullname">NOM & PRÉNOM</div>
+                <div class="cert-detail-line" style="margin-top:4px;">Élève en classe de <strong id="cert-classe" style="color:#0F172A;">--</strong></div>
+                <div class="cert-detail-line"><strong id="cert-school-name" style="color:#0F172A;">--</strong></div>
+                <div style="font-size:10px; font-style:italic; color:#64748B; margin-top:4px;">Pour son travail remarquable et sa constante persévérance.</div>
+              </div>
+            </div>
+
+            <!-- MOYENNE CENTRÉE PREMIUM -->
+            <div class="cert-badge-box">
+              <div>
+                <div class="cert-badge-lbl" id="cert-period-lbl">Moyenne Annuelle</div>
+                <div class="cert-badge-val" id="cert-annual-val">-- /20</div>
+              </div>
+              <div style="height:25px; width:1px; background:#F59E0B;"></div>
+              <div>
+                <div class="cert-badge-lbl">Mention</div>
+                <div class="cert-badge-mention" id="cert-mention-lbl">--</div>
+              </div>
+            </div>
+
+            <p style="font-size:10px; color:#334155; line-height:1.45; text-align:center; padding:0 4px; margin:10px 0; font-weight:600;">
+              Grâce à ton sérieux, ta discipline et ton goût de l'effort, tu mérites amplement ta place dans le <strong>TABLEAU D'HONNEUR</strong>. Continue de viser l'excellence !
+            </p>
+
+            <div class="cert-footer-portrait">
+              <div style="text-align:left;">
+                <div style="font-size:9px; font-weight:800; color:#64748B;">Année scolaire : <span id="cert-school-year">2025-2026</span></div>
+                <img src="https://i.postimg.cc/HjDJvjqX/file-00000000685081f4afaf53efdfb26e58.png" style="height:18px; margin-top:4px;" />
+              </div>
+
+              <div style="text-align:right;">
+                <div class="cert-signature-title">Signature</div>
+                <div class="cert-signature-font">Zakaria Niampa</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-print-cert" onclick="window.print()">
+        <span>🖨️ Imprimer le Tableau d'honneur</span>
+      </button>
+
+    </div>
+
+    <!-- ================= 6. PAGE MOYENNE D'ORIENTATION (CLASSE DE 3E) ================= -->
+    <div id="view-orientation" class="page-view">
+      <div style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn-back-link" onclick="switchPage('view-dashboard')">⬅️ Retour</button>
+        <span style="font-size:12px; font-weight:800; color:#818CF8;">🎯 ORIENTATION BEPC</span>
+      </div>
+
+      <div style="padding: 0 16px;">
+        <div style="background: linear-gradient(135deg, #1E1B4B, #312E81); border-radius: var(--radius-xl); padding: 18px; border: 1.5px solid #818CF8; margin-bottom: 16px;">
+          <h2 style="font-size: 16px; font-weight: 900; color:#FFF; margin-bottom: 4px;">🎯 Calcul de la Moyenne d'Orientation</h2>
+          <p style="font-size: 11px; color: #C7D2FE; line-height: 1.4;">
+            Calcul officiel basé sur vos moyennes trimestrielles réelles et vos résultats au BEPC.
+          </p>
+        </div>
+
+        <!-- RESULTAT MO FINAL -->
+        <div id="orient-result-card" style="background:#111827; border:2px solid var(--orange-ztv); border-radius:var(--radius-xl); padding:20px; text-align:center; margin-bottom:18px;">
+          <div style="font-size:11px; font-weight:800; color:var(--text-gray); text-transform:uppercase;">🎯 Moyenne d'Orientation Finale</div>
+          <div style="font-size:32px; font-weight:900; color:var(--orange-ztv); margin:6px 0;" id="orient-score-val">-- / 20</div>
+          <div style="font-size:11px; font-weight:700; color:#A5B4FC;" id="orient-appreciation-lbl">Veuillez renseigner vos moyennes BEPC ci-dessous</div>
+        </div>
+
+        <div id="orient-missing-warning" style="display:none; background:rgba(239, 68, 68, 0.15); border:1.5px solid #EF4444; border-radius:var(--radius-lg); padding:12px 16px; margin-bottom:16px; font-size:11px; color:#FCA5A5; line-height:1.4;">
+          ⚠️ <strong>Calcul impossible pour le moment :</strong> Les trois trimestres doivent être complets pour calculer la moyenne d'orientation.
+        </div>
+
+        <!-- FORMULAIRE SAISIE NOTES BEPC -->
+        <h3 style="font-size:13px; font-weight:800; color:#FFF; margin-bottom:12px;">📝 Saisie des moyennes du BEPC</h3>
+
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+          <!-- FRANCAIS -->
+          <div style="background:var(--bg-card); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:14px;">
+            <div style="font-size:12px; font-weight:800; color:#FFF; margin-bottom:8px;">🇫🇷 Français (Coef. 2)</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:center;">
+              <div style="font-size:10px; color:var(--text-gray);">Moy. Annuelle: <strong id="or-ma-fr" style="color:#FFF;">--</strong></div>
+              <div>
+                <input type="number" min="0" max="20" step="0.25" class="form-input" id="bepc-note-fr" placeholder="Moyenne BEPC /20" oninput="calculerMoyenneOrientation()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- MATHS -->
+          <div style="background:var(--bg-card); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:14px;">
+            <div style="font-size:12px; font-weight:800; color:#FFF; margin-bottom:8px;">➗ Mathématiques (Coef. 2)</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:center;">
+              <div style="font-size:10px; color:var(--text-gray);">Moy. Annuelle: <strong id="or-ma-ma" style="color:#FFF;">--</strong></div>
+              <div>
+                <input type="number" min="0" max="20" step="0.25" class="form-input" id="bepc-note-ma" placeholder="Moyenne BEPC /20" oninput="calculerMoyenneOrientation()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- PHYSIQUE CHIMIE -->
+          <div style="background:var(--bg-card); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:14px;">
+            <div style="font-size:12px; font-weight:800; color:#FFF; margin-bottom:8px;">⚛️ Physique-Chimie (Coef. 1)</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:center;">
+              <div style="font-size:10px; color:var(--text-gray);">Moy. Annuelle: <strong id="or-ma-pc" style="color:#FFF;">--</strong></div>
+              <div>
+                <input type="number" min="0" max="20" step="0.25" class="form-input" id="bepc-note-pc" placeholder="Moyenne BEPC /20" oninput="calculerMoyenneOrientation()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- ANGLAIS PARTICULIER (ECRIT + ORAL / 2) -->
+          <div style="background:var(--bg-card); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:14px;">
+            <div style="font-size:12px; font-weight:800; color:#FFF; margin-bottom:4px;">🇬🇧 Anglais (Coef. 1)</div>
+            <div style="font-size:10px; color:var(--text-gray); margin-bottom:8px;">Moy. Annuelle: <strong id="or-ma-an" style="color:#FFF;">--</strong></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <input type="number" min="0" max="20" step="0.25" class="form-input" id="bepc-an-ecrit" placeholder="Écrit /20" oninput="calculerMoyenneOrientation()" />
+              <input type="number" min="0" max="20" step="0.25" class="form-input" id="bepc-an-oral" placeholder="Oral /20" oninput="calculerMoyenneOrientation()" />
+            </div>
+          </div>
+        </div>
+
+        <!-- RECAPITULATIF TABLEAU -->
+        <h3 style="font-size:13px; font-weight:800; color:#FFF; margin-bottom:10px;">📋 Récapitulatif des 4 Matières</h3>
+        <table class="bulletin-table" style="margin-bottom:30px;">
+          <thead>
+            <tr>
+              <th>Matière</th>
+              <th>M.A.</th>
+              <th>BEPC</th>
+              <th>Total /40</th>
+              <th>Coef</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Français</td>
+              <td id="rec-ma-fr">-</td>
+              <td id="rec-bepc-fr">-</td>
+              <td id="rec-tot-fr" style="font-weight:900; color:var(--orange-ztv);">-</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td>Maths</td>
+              <td id="rec-ma-ma">-</td>
+              <td id="rec-bepc-ma">-</td>
+              <td id="rec-tot-ma" style="font-weight:900; color:var(--orange-ztv);">-</td>
+              <td>2</td>
+            </tr>
+            <tr>
+              <td>Physique-Chimie</td>
+              <td id="rec-ma-pc">-</td>
+              <td id="rec-bepc-pc">-</td>
+              <td id="rec-tot-pc" style="font-weight:900; color:var(--orange-ztv);">-</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>Anglais</td>
+              <td id="rec-ma-an">-</td>
+              <td id="rec-bepc-an">-</td>
+              <td id="rec-tot-an" style="font-weight:900; color:var(--orange-ztv);">-</td>
+              <td>1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ================= 7. MODALE POPUP DYNAMIQUE ================= -->
+    <div class="modal-overlay" id="modal-container">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title" id="modal-title-text">Titre Modale</div>
+          <div class="modal-close-btn" onclick="closeModal()">✕</div>
+        </div>
+        <div id="modal-body-content">
+          <!-- Contenu dynamique -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 8. BOUTON WHATSAPP FLOTTANT ================= -->
+    <a href="https://wa.me/2250799591024" target="_blank" class="whatsapp-float-btn" title="Nous contacter sur WhatsApp">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFF">
+        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.572-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+      </svg>
+    </a>
+
+  </div>
+
+  <script>
+    let activeTrimestre = 1;
+    let selectedCertifPeriod = 'annuel';
+
+    // BASE DE DONNÉES LOCALE DES COMPTES ENREGISTRÉS
+    let registeredUsers = [];
+
+    // COMPTE EN COURS
+    let currentUser = null;
+
+    let trimestresData = {
+      1: { points: 0, coefs: 0, moyenne: null, subjects: {} },
+      2: { points: 0, coefs: 0, moyenne: null, subjects: {} },
+      3: { points: 0, coefs: 0, moyenne: null, subjects: {} }
+    };
+
+    window.onload = function() {
+      const d = new Date();
+      const yr = d.getFullYear();
+      const schoolYr = (d.getMonth() >= 8) ? yr + "-" + (yr + 1) : (yr - 1) + "-" + yr;
+      document.getElementById('cert-school-year').innerText = schoolYr;
+    };
+
+    function switchPage(pageId) {
+      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      if(pageId === 'view-orientation') {
+        preparerPageOrientation();
+      }
+    }
+
+    function switchAuthTab(tab) {
+      const loginBtn = document.getElementById('tab-login-btn');
+      const regBtn = document.getElementById('tab-register-btn');
+      const loginForm = document.getElementById('form-login-content');
+      const regForm = document.getElementById('form-register-content');
+
+      document.getElementById('login-error-msg').style.display = 'none';
+      document.getElementById('reg-error-msg').style.display = 'none';
+
+      if(tab === 'login') {
+        loginBtn.classList.add('active'); regBtn.classList.remove('active');
+        loginForm.style.display = 'block'; regForm.style.display = 'none';
+      } else {
+        regBtn.classList.add('active'); loginBtn.classList.remove('active');
+        loginForm.style.display = 'none'; regForm.style.display = 'block';
+      }
+    }
+
+    /* GESTION DE LA PHOTO DEPUIS LA GALERIE */
+    function handlePhotoSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          if(currentUser) {
+            currentUser.photo = e.target.result;
+          }
+          document.getElementById('photo-preview-msg').innerText = "✓ Photo sélectionnée : " + file.name;
+          updateAppPhotos();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function triggerPhotoChange() {
+      document.getElementById('reg-photo-file').click();
+    }
+
+    function updateAppPhotos() {
+      const photoSrc = (currentUser && currentUser.photo) ? currentUser.photo : "https://i.postimg.cc/Z5t6ctQQ/file-000000008a6081f9a7552dfe57d5c70d.png";
+      document.getElementById('dash-avatar-img').src = photoSrc;
+      document.getElementById('profile-avatar-img').src = photoSrc;
+      document.getElementById('cert-photo-img').src = photoSrc;
+    }
+
+    function checkClasse3emeUI() {
+      const classe = (currentUser && currentUser.classe) ? currentUser.classe : document.getElementById('reg-classe').value;
+      const is3eme = (classe === "3ème" || classe === "3e" || classe === "3E");
+      document.getElementById('card-orientation-3eme-wrapper').style.display = is3eme ? "block" : "none";
+    }
+
+    /* MENTION AUTOMATIQUE BASÉE SUR LA MOYENNE */
+    function meGetMention(moyenne) {
+      if(moyenne === null || isNaN(moyenne)) return "--";
+      if(moyenne < 10) return "Ajourné / Insuffisant";
+      if(moyenne < 12) return "Passable";
+      if(moyenne < 14) return "Assez Bien";
+      if(moyenne < 16) return "Bien";
+      if(moyenne < 18) return "Très Bien";
+      return "Excellente / Félicitations";
+    }
+
+    /* AUTHENTIFICATION & SÉCURITÉ COMPTE */
+    function actionLogin() {
+      const loginInput = document.getElementById('login-fullname').value.trim();
+      const passInput = document.getElementById('login-pass').value;
+      const errBox = document.getElementById('login-error-msg');
+
+      errBox.style.display = 'none';
+
+      if(!loginInput || !passInput) {
+        errBox.innerText = "Vos informations sont incorrectes. Veuillez vérifier vos informations et réessayer.";
+        errBox.style.display = 'block';
+        return;
+      }
+
+      // Recherche dans la base locale d'utilisateurs
+      const existingUser = registeredUsers.find(u => 
+        (u.fullname.toLowerCase() === loginInput.toLowerCase() || u.nom.toLowerCase() === loginInput.toLowerCase()) && u.pass === passInput
+      );
+
+      if(existingUser) {
+        currentUser = existingUser;
+        trimestresData = currentUser.trimestresData;
+        updateProfileDisplay();
+        updateAppPhotos();
+        checkClasse3emeUI();
+        switchPage('view-dashboard');
+        actualiserMoyennesGlobales();
+      } else {
+        errBox.innerText = "Vos informations sont incorrectes. Veuillez vérifier vos informations et réessayer.";
+        errBox.style.display = 'block';
+      }
+    }
+
+    function actionRegister() {
+      const nom = document.getElementById('reg-nom').value.trim();
+      const prenom = document.getElementById('reg-prenom').value.trim();
+      const pass = document.getElementById('reg-pass').value;
+      const errBox = document.getElementById('reg-error-msg');
+
+      errBox.style.display = 'none';
+
+      if(!nom || !prenom || !pass) {
+        errBox.innerText = "Veuillez remplir tous les champs obligatoires (Nom, Prénom, Mot de passe).";
+        errBox.style.display = 'block';
+        return;
+      }
+
+      const fullname = (nom + " " + prenom).trim();
+
+      // Vérification des doublons d'identification
+      const duplicate = registeredUsers.find(u => u.fullname.toLowerCase() === fullname.toLowerCase());
+
+      if(duplicate) {
+        errBox.innerText = "Ces informations ont déjà un compte actif. Veuillez vous connecter.";
+        errBox.style.display = 'block';
+        setTimeout(() => switchAuthTab('login'), 2500);
+        return;
+      }
+
+      // Saisie d'un nouveau compte
+      const photoSrc = document.getElementById('photo-preview-msg').innerText.includes("✓") && currentUser && currentUser.photo 
+        ? currentUser.photo 
+        : "https://i.postimg.cc/Z5t6ctQQ/file-000000008a6081f9a7552dfe57d5c70d.png";
+
+      const newUser = {
+        nom: nom,
+        prenom: prenom,
+        fullname: fullname,
+        pass: pass,
+        etablissement: document.getElementById('reg-etablissement').value.trim(),
+        ville: document.getElementById('reg-ville').value.trim(),
+        classe: document.getElementById('reg-classe').value,
+        whatsapp: document.getElementById('reg-whatsapp').value.trim(),
+        pays: document.getElementById('reg-pays').value,
+        dateCreation: new Date().toLocaleDateString('fr-FR'),
+        photo: photoSrc,
+        trimestresData: {
+          1: { points: 0, coefs: 0, moyenne: null, subjects: {} },
+          2: { points: 0, coefs: 0, moyenne: null, subjects: {} },
+          3: { points: 0, coefs: 0, moyenne: null, subjects: {} }
+        }
+      };
+
+      registeredUsers.push(newUser);
+      currentUser = newUser;
+      trimestresData = currentUser.trimestresData;
+
+      updateProfileDisplay();
+      updateAppPhotos();
+      checkClasse3emeUI();
+
+      switchPage('view-dashboard');
+      actualiserMoyennesGlobales();
+    }
+
+    function updateProfileDisplay() {
+      if(!currentUser) return;
+      document.getElementById('dash-user-name').innerText = currentUser.fullname + " 👋";
+      document.getElementById('prof-disp-fullname').innerText = currentUser.fullname;
+      document.getElementById('prof-nom').innerText = currentUser.nom || "--";
+      document.getElementById('prof-prenom').innerText = currentUser.prenom || "--";
+      document.getElementById('prof-etablissement').innerText = currentUser.etablissement || "--";
+      document.getElementById('prof-classe').innerText = currentUser.classe || "--";
+      document.getElementById('prof-ville').innerText = currentUser.ville || "--";
+      document.getElementById('prof-pays').innerText = currentUser.pays;
+      document.getElementById('prof-whatsapp').innerText = currentUser.whatsapp || "--";
+      document.getElementById('prof-created-date').innerText = currentUser.dateCreation;
+
+      document.getElementById('cert-fullname').innerText = currentUser.fullname;
+      document.getElementById('cert-school-name').innerText = currentUser.etablissement || "Établissement Scolaire";
+      document.getElementById('cert-classe').innerText = currentUser.classe || "Non spécifiée";
+    }
+
+    function actionLogout() {
+      currentUser = null;
+      trimestresData = {
+        1: { points: 0, coefs: 0, moyenne: null, subjects: {} },
+        2: { points: 0, coefs: 0, moyenne: null, subjects: {} },
+        3: { points: 0, coefs: 0, moyenne: null, subjects: {} }
+      };
+      switchPage('view-auth');
+    }
+
+    /* SAISIE TRIMESTRIELLE */
+    function openTrimPage(tNum) {
+      activeTrimestre = tNum;
+      document.getElementById('trim-entry-title').innerText = "Saisie des Moyennes - " + tNum + (tNum === 1 ? "er" : "e") + " Trimestre";
+      
+      const rows = document.querySelectorAll('#bulletin tbody tr[data-subject]');
+      rows.forEach(tr => {
+        const subject = tr.getAttribute('data-subject');
+        const noteInput = tr.querySelector('.inp-note');
+        if(trimestresData[tNum].subjects[subject] !== undefined) {
+          noteInput.value = trimestresData[tNum].subjects[subject].note;
+        } else {
+          noteInput.value = "";
+        }
+      });
+
+      calculerBulletin();
+      switchPage('view-trim-entry');
+    }
+
+    function calculerBulletin() {
+      const rows = document.querySelectorAll('#bulletin tbody tr[data-subject]');
+      let totPoints = 0;
+      let totCoefs = 0;
+
+      rows.forEach(tr => {
+        const coef = parseFloat(tr.querySelector('.inp-coef').value) || 0;
+        const noteInput = tr.querySelector('.inp-note');
+        const note = parseFloat(noteInput.value);
+        const totCell = tr.querySelector('.tot-cell');
+
+        if(!isNaN(note) && note >= 0 && note <= 20) {
+          const pt = note * coef;
+          totPoints += pt;
+          totCoefs += coef;
+          totCell.innerText = pt.toFixed(2);
+        } else {
+          totCell.innerText = "-";
+        }
+      });
+
+      document.getElementById('total-coefs').innerText = totCoefs;
+      document.getElementById('total-points').innerText = totPoints.toFixed(2);
+    }
+
+    function enregistrerPageTrimestre() {
+      const rows = document.querySelectorAll('#bulletin tbody tr[data-subject]');
+      let totPoints = 0;
+      let totCoefs = 0;
+      let subs = {};
+
+      rows.forEach(tr => {
+        const subject = tr.getAttribute('data-subject');
+        const coef = parseFloat(tr.querySelector('.inp-coef').value) || 0;
+        const noteInput = tr.querySelector('.inp-note');
+        const note = parseFloat(noteInput.value);
+
+        if(!isNaN(note) && note >= 0 && note <= 20) {
+          subs[subject] = { note: note, coef: coef };
+          totPoints += (note * coef);
+          totCoefs += coef;
+        }
+      });
+
+      if(totCoefs > 0) {
+        trimestresData[activeTrimestre].points = totPoints;
+        trimestresData[activeTrimestre].coefs = totCoefs;
+        trimestresData[activeTrimestre].moyenne = totPoints / totCoefs;
+        trimestresData[activeTrimestre].subjects = subs;
+      } else {
+        trimestresData[activeTrimestre].moyenne = null;
+        trimestresData[activeTrimestre].subjects = {};
+      }
+
+      if(currentUser) {
+        currentUser.trimestresData = trimestresData;
+      }
+
+      actualiserMoyennesGlobales();
+      switchPage('view-dashboard');
+    }
+
+    function actualiserMoyennesGlobales() {
+      // 1. Mettre à jour les 3 trimestres
+      const t1 = trimestresData[1].moyenne;
+      const t2 = trimestresData[2].moyenne;
+      const t3 = trimestresData[3].moyenne;
+
+      document.getElementById('val-t1').innerText = (t1 !== null) ? t1.toFixed(2) + " /20" : "-- /20";
+      document.getElementById('val-t2').innerText = (t2 !== null) ? t2.toFixed(2) + " /20" : "-- /20";
+      document.getElementById('val-t3').innerText = (t3 !== null) ? t3.toFixed(2) + " /20" : "-- /20";
+
+      document.getElementById('prof-t1-val').innerText = (t1 !== null) ? t1.toFixed(2) + " /20" : "-- /20";
+      document.getElementById('prof-t2-val').innerText = (t2 !== null) ? t2.toFixed(2) + " /20" : "-- /20";
+      document.getElementById('prof-t3-val').innerText = (t3 !== null) ? t3.toFixed(2) + " /20" : "-- /20";
+
+      // 2. MOYENNE ANNUELLE : Règle stricte (3 trimestres obligatoires)
+      if(t1 !== null && t2 !== null && t3 !== null) {
+        const moyAnnuelle = (t1 + t2 + t3) / 3;
+        document.getElementById('val-annual').innerText = moyAnnuelle.toFixed(2) + " /20";
+        document.getElementById('prof-annuel-val').innerText = moyAnnuelle.toFixed(2) + " /20";
+        
+        const mention = meGetMention(moyAnnuelle);
+        document.getElementById('val-mention').innerText = mention;
+        document.getElementById('prof-mention-val').innerText = mention;
+
+        const decision = (moyAnnuelle >= 10) ? "Admis(e) 🟢" : "Ajourné(e) 🔴";
+        document.getElementById('val-decision').innerText = decision;
+      } else {
+        document.getElementById('val-annual').innerText = "-- /20";
+        document.getElementById('prof-annuel-val').innerText = "-- /20";
+        document.getElementById('val-mention').innerText = "--";
+        document.getElementById('prof-mention-val').innerText = "--";
+        document.getElementById('val-decision').innerText = "--";
+      }
+
+      // 3. PROGRESSION RÉELLE DYNAMIQUE
+      let availableMoyennes = [];
+      if(t1 !== null) availableMoyennes.push(t1);
+      if(t2 !== null) availableMoyennes.push(t2);
+      if(t3 !== null) availableMoyennes.push(t3);
+
+      if(availableMoyennes.length > 0) {
+        const sumMoy = availableMoyennes.reduce((a, b) => a + b, 0);
+        const avgCurrent = sumMoy / availableMoyennes.length;
+        
+        const pctFill = Math.min(Math.max((avgCurrent / 20) * 100, 0), 100);
+
+        document.getElementById('circle-pct').innerText = avgCurrent.toFixed(2) + "/20";
+        const barFill = document.getElementById('bar-fill');
+        const circlePct = document.getElementById('circle-pct');
+        barFill.style.width = pctFill + "%";
+
+        // Couleur dynamique de la progression
+        let colorCode = "#EF4444"; // rouge si < 10
+        if(avgCurrent >= 14) colorCode = "#09A63D"; // vert
+        else if(avgCurrent >= 10) colorCode = "#FF8C00"; // orange
+
+        barFill.style.background = colorCode;
+        circlePct.style.borderColor = colorCode;
+
+        document.getElementById('prog-desc').innerText = "Moyenne actuelle basée sur " + availableMoyennes.length + " trimestre(s)";
+      } else {
+        document.getElementById('circle-pct').innerText = "0/20";
+        document.getElementById('bar-fill').style.width = "0%";
+        document.getElementById('bar-fill').style.background = "#EF4444";
+        document.getElementById('circle-pct').style.borderColor = "#EF4444";
+        document.getElementById('prog-desc').innerText = "Saisissez au moins un trimestre";
+      }
+    }
+
+    /* OBJECTIF DYNAMIQUE INTELLIGENT */
+    function openModalObjectif() {
+      const t1 = trimestresData[1].moyenne;
+      const t2 = trimestresData[2].moyenne;
+      const t3 = trimestresData[3].moyenne;
+
+      let htmlContent = "";
+
+      // Récupération des matières faibles (<10/20)
+      let weakSubjects = [];
+      [1, 2, 3].forEach(t => {
+        const subs = trimestresData[t].subjects;
+        for(let s in subs) {
+          if(subs[s].note < 10 && !weakSubjects.includes(s)) {
+            weakSubjects.push(s);
+          }
+        }
+      });
+
+      if(t1 === null && t2 === null && t3 === null) {
+        htmlContent = `
+          <div style="text-align:center; padding:10px 0;">
+            <p style="font-size:13px; color:#FFF; line-height:1.5;">Veuillez d'abord saisir vos moyennes d'au moins un trimestre pour générer un objectif personnalisé.</p>
+            <button class="btn-main-green" style="margin-top:16px;" onclick="closeModal()">Compris</button>
+          </div>
+        `;
+      } else if(t1 !== null && t2 !== null && t3 !== null) {
+        const moyAnnuelle = (t1 + t2 + t3) / 3;
+        if(moyAnnuelle >= 10) {
+          htmlContent = `
+            <div style="padding:10px 0;">
+              <p style="font-size:13px; color:#10B981; font-weight:800; text-align:center; margin-bottom:12px;">🎉 Félicitations ! Votre moyenne annuelle est de ${moyAnnuelle.toFixed(2)}/20.</p>
+              <p style="font-size:12px; color:#FFF; line-height:1.5;">Vous remplissez les conditions pour passer en classe supérieure. Continuez à maintenir cet effort pour la suite de votre cursus.</p>
+            </div>
+          `;
+        } else {
+          htmlContent = `
+            <div style="padding:10px 0;">
+              <p style="font-size:13px; color:#EF4444; font-weight:800; text-align:center; margin-bottom:12px;">⚠️ Moyenne annuelle insuffisante (${moyAnnuelle.toFixed(2)}/20)</p>
+              <p style="font-size:12px; color:#FFF; line-height:1.5; margin-bottom:10px;">Vos résultats actuels ne vous permettent pas encore de passer en classe supérieure.</p>
+              ${weakSubjects.length > 0 ? `<p style="font-size:11px; color:var(--orange-ztv); font-weight:700;">Matières prioritaires à renforcer : ${weakSubjects.join(", ")}.</p>` : ''}
+            </div>
+          `;
+        }
+      } else {
+        // Trimestres partiels renseignés
+        let count = 0, sum = 0;
+        if(t1 !== null) { sum += t1; count++; }
+        if(t2 !== null) { sum += t2; count++; }
+
+        const reqTotal = 30 - sum;
+
+        if(count === 1) {
+          const reqPerTrim = reqTotal / 2;
+          if(reqPerTrim > 20) {
+            htmlContent = `
+              <div style="padding:10px 0;">
+                <p style="font-size:13px; color:#FFF; line-height:1.5; margin-bottom:12px;">
+                  1er trimestre renseigné : <strong>${t1.toFixed(2)}/20</strong>.<br>
+                  Pour obtenir la moyenne de passage (10/20), vous devez obtenir au total <strong>${reqTotal.toFixed(2)} points</strong> cumulés sur les trimestres 2 et 3.
+                </p>
+                ${weakSubjects.length > 0 ? `<p style="font-size:11px; color:var(--orange-ztv); font-weight:700;">Concentrez vos révisions sur : ${weakSubjects.join(", ")}.</p>` : ''}
+              </div>
+            `;
+          } else if(reqPerTrim <= 0) {
+            htmlContent = `
+              <div style="padding:10px 0;">
+                <p style="font-size:13px; color:#10B981; font-weight:800; margin-bottom:8px;">Excellent démarrage !</p>
+                <p style="font-size:12px; color:#FFF; line-height:1.5;">Avec votre note de ${t1.toFixed(2)}/20 au 1er trimestre, il vous suffit de maintenir une moyenne minimale très accessible aux prochains trimestres pour valider votre passage.</p>
+              </div>
+            `;
+          } else {
+            htmlContent = `
+              <div style="padding:10px 0;">
+                <p style="font-size:13px; color:#FFF; line-height:1.5; margin-bottom:12px;">
+                  Objectif : Pour passer en classe supérieure, vous devez viser une moyenne minimale de <strong>${reqPerTrim.toFixed(2)}/20</strong> sur chacun des deux trimestres restants.
+                </p>
+                ${weakSubjects.length > 0 ? `<p style="font-size:11px; color:var(--orange-ztv); font-weight:700;">Disciplines prioritaires à travailler : ${weakSubjects.join(", ")}.</p>` : ''}
+              </div>
+            `;
+          }
+        } else if(count === 2) {
+          const reqT3 = reqTotal;
+          if(reqT3 > 20) {
+            htmlContent = `
+              <div style="padding:10px 0;">
+                <p style="font-size:13px; color:#EF4444; font-weight:800; margin-bottom:8px;">Situation délicate</p>
+                <p style="font-size:12px; color:#FFF; line-height:1.5; margin-bottom:10px;">
+                  Vos deux premiers trimestres totalisent ${(sum/2).toFixed(2)}/20. Mathématiquement, l'objectif de 10/20 annuel requiert ${reqT3.toFixed(2)}/20 au T3. Visez la meilleure note possible au 3e trimestre.
+                </p>
+                ${weakSubjects.length > 0 ? `<p style="font-size:11px; color:var(--orange-ztv); font-weight:700;">Matières les plus faibles : ${weakSubjects.join(", ")}.</p>` : ''}
+              </div>
+            `;
+          } else if(reqT3 <= 0) {
+            htmlContent = `
+              <div style="padding:10px 0;">
+                <p style="font-size:13px; color:#10B981; font-weight:800; margin-bottom:8px;">Passage très bien engagé !</p>
+                <p style="font-size:12px; color:#FFF; line-height:1.5;">Vous avez déjà accumulé suffisamment de points sur les 2 premiers trimestres. Continuez sur cette lancée pour terminer en beauté au 3e trimestre.</p>
+              </div>
+            `;
+          } else {
+            htmlContent = `
+              <div style="padding:10px 0;">
+                <p style="font-size:13px; color:#FFF; line-height:1.5; margin-bottom:12px;">
+                  <strong>Objectif 3e trimestre :</strong> Pour atteindre la moyenne de passage, vous devez viser au minimum <strong>${reqT3.toFixed(2)}/20</strong> au 3e trimestre.
+                </p>
+                ${weakSubjects.length > 0 ? `<p style="font-size:11px; color:var(--orange-ztv); font-weight:700;">Points de vigilance : ${weakSubjects.join(", ")}.</p>` : ''}
+              </div>
+            `;
+          }
+        }
+      }
+
+      openModal("🎯 Objectif de Passage", htmlContent);
+    }
+
+    /* TABLEAU D'HONNEUR (SEUIL AUTOMATIQUE >= 13/20) */
+    function meObtenirMoyennePeriode(periode) {
+      if(periode === 't1') return trimestresData[1].moyenne;
+      if(periode === 't2') return trimestresData[2].moyenne;
+      if(periode === 't3') return trimestresData[3].moyenne;
+      
+      const t1 = trimestresData[1].moyenne;
+      const t2 = trimestresData[2].moyenne;
+      const t3 = trimestresData[3].moyenne;
+
+      return (t1 !== null && t2 !== null && t3 !== null) ? ((t1 + t2 + t3) / 3) : null;
+    }
+
+    function ouvrirTableauHonneurAccueil() {
+      let moy = meObtenirMoyennePeriode('annuel');
+      if(moy !== null && moy >= 13.0) {
+        changeCertifPeriod('annuel');
+        switchPage('view-certif');
+      } else {
+        const dispMoy = (moy !== null) ? moy.toFixed(2) : "--";
+        const htmlMsg = `
+          <div style="text-align:center; padding:10px 0;">
+            <div style="font-size:42px; margin-bottom:10px;">🏆</div>
+            <p style="font-size:13px; color:#FFF; line-height:1.5; margin-bottom:16px;">
+              Votre moyenne annuelle est de <strong>${dispMoy} / 20</strong>.<br><br>
+              Elle ne vous permet pas encore d'accéder au <strong>Tableau d'honneur</strong>, dont la moyenne minimale est fixée à <strong>13/20</strong> (les 3 trimestres doivent être complétés).
+            </p>
+            <p style="font-size:12px; color:var(--orange-ztv); font-weight:700; line-height:1.4; margin-bottom:20px;">
+              Continuez vos efforts et travaillez régulièrement ! 💪📚
+            </p>
+            <button class="btn-main-green" onclick="closeModal()">Compris</button>
+          </div>
+        `;
+        openModal("🏆 Tableau d'honneur", htmlMsg);
+      }
+    }
+
+    function changeCertifPeriod(period) {
+      selectedCertifPeriod = period;
+      document.querySelectorAll('.certif-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('cert-tab-' + period).classList.add('active');
+
+      const moy = meObtenirMoyennePeriode(period);
+      const periodNames = { 'annuel': 'Annuel', 't1': '1er Trimestre', 't2': '2e Trimestre', 't3': '3e Trimestre' };
+
+      if(moy !== null && moy >= 13.0) {
+        document.getElementById('cert-period-lbl').innerText = "Moyenne " + periodNames[period];
+        document.getElementById('cert-annual-val').innerText = moy.toFixed(2) + " /20";
+        document.getElementById('cert-mention-lbl').innerText = meGetMention(moy);
+      } else {
+        const dispMoy = (moy !== null) ? moy.toFixed(2) : "0.00";
+        const htmlMsg = `
+          <div style="text-align:center; padding:10px 0;">
+            <div style="font-size:42px; margin-bottom:10px;">🏆</div>
+            <p style="font-size:13px; color:#FFF; line-height:1.5; margin-bottom:16px;">
+              Votre moyenne pour le <strong>${periodNames[period]}</strong> est de <strong>${dispMoy} / 20</strong>.<br><br>
+              Elle ne vous permet pas d'accéder au Tableau d'honneur (Moyenne minimale : <strong>13/20</strong>).
+            </p>
+            <button class="btn-main-green" onclick="closeModal(); switchPage('view-dashboard');">Compris</button>
+          </div>
+        `;
+        openModal("🏆 Tableau d'honneur", htmlMsg);
+      }
+    }
+
+    /* LOGIQUE CALCUL MOYENNE D'ORIENTATION (3EME) */
+    function preparerPageOrientation() {
+      const matieresTarget = ["Français", "Mathématiques", "Physique - Chimie", "Anglais"];
+      let maResults = {};
+      let missingAny = false;
+
+      matieresTarget.forEach(sub => {
+        const t1Note = trimestresData[1].subjects[sub]?.note;
+        const t2Note = trimestresData[2].subjects[sub]?.note;
+        const t3Note = trimestresData[3].subjects[sub]?.note;
+
+        if(t1Note !== undefined && t2Note !== undefined && t3Note !== undefined) {
+          const ma = (t1Note + (t2Note * 2) + (t3Note * 2)) / 5;
+          maResults[sub] = ma;
+        } else {
+          maResults[sub] = null;
+          missingAny = true;
+        }
+      });
+
+      document.getElementById('or-ma-fr').innerText = (maResults["Français"] !== null) ? maResults["Français"].toFixed(2) + " /20" : "Manquante";
+      document.getElementById('or-ma-ma').innerText = (maResults["Mathématiques"] !== null) ? maResults["Mathématiques"].toFixed(2) + " /20" : "Manquante";
+      document.getElementById('or-ma-pc').innerText = (maResults["Physique - Chimie"] !== null) ? maResults["Physique - Chimie"].toFixed(2) + " /20" : "Manquante";
+      document.getElementById('or-ma-an').innerText = (maResults["Anglais"] !== null) ? maResults["Anglais"].toFixed(2) + " /20" : "Manquante";
+
+      document.getElementById('rec-ma-fr').innerText = (maResults["Français"] !== null) ? maResults["Français"].toFixed(2) : "-";
+      document.getElementById('rec-ma-ma').innerText = (maResults["Mathématiques"] !== null) ? maResults["Mathématiques"].toFixed(2) : "-";
+      document.getElementById('rec-ma-pc').innerText = (maResults["Physique - Chimie"] !== null) ? maResults["Physique - Chimie"].toFixed(2) : "-";
+      document.getElementById('rec-ma-an').innerText = (maResults["Anglais"] !== null) ? maResults["Anglais"].toFixed(2) : "-";
+
+      document.getElementById('orient-missing-warning').style.display = missingAny ? 'block' : 'none';
+
+      calculerMoyenneOrientation();
+    }
+
+    function calculerMoyenneOrientation() {
+      const bepcFr = parseFloat(document.getElementById('bepc-note-fr').value);
+      const bepcMa = parseFloat(document.getElementById('bepc-note-ma').value);
+      const bepcPc = parseFloat(document.getElementById('bepc-note-pc').value);
+
+      const bepcAnEcrit = parseFloat(document.getElementById('bepc-an-ecrit').value);
+      const bepcAnOral = parseFloat(document.getElementById('bepc-an-oral').value);
+
+      let bepcAnFinal = null;
+      if(!isNaN(bepcAnEcrit) && !isNaN(bepcAnOral)) {
+        bepcAnFinal = (bepcAnEcrit + bepcAnOral) / 2;
+      }
+
+      const getMA = (sub) => {
+        const t1 = trimestresData[1].subjects[sub]?.note;
+        const t2 = trimestresData[2].subjects[sub]?.note;
+        const t3 = trimestresData[3].subjects[sub]?.note;
+        return (t1 !== undefined && t2 !== undefined && t3 !== undefined) ? ((t1 + (t2*2) + (t3*2))/5) : null;
+      };
+
+      const maFr = getMA("Français");
+      const maMa = getMA("Mathématiques");
+      const maPc = getMA("Physique - Chimie");
+      const maAn = getMA("Anglais");
+
+      let totFr = (maFr !== null && !isNaN(bepcFr)) ? (maFr + bepcFr) : null;
+      let totMa = (maMa !== null && !isNaN(bepcMa)) ? (maMa + bepcMa) : null;
+      let totPc = (maPc !== null && !isNaN(bepcPc)) ? (maPc + bepcPc) : null;
+      let totAn = (maAn !== null && bepcAnFinal !== null) ? (maAn + bepcAnFinal) : null;
+
+      document.getElementById('rec-bepc-fr').innerText = !isNaN(bepcFr) ? bepcFr.toFixed(2) : "-";
+      document.getElementById('rec-bepc-ma').innerText = !isNaN(bepcMa) ? bepcMa.toFixed(2) : "-";
+      document.getElementById('rec-bepc-pc').innerText = !isNaN(bepcPc) ? bepcPc.toFixed(2) : "-";
+      document.getElementById('rec-bepc-an').innerText = (bepcAnFinal !== null) ? bepcAnFinal.toFixed(2) : "-";
+
+      document.getElementById('rec-tot-fr').innerText = (totFr !== null) ? totFr.toFixed(2) + " /40" : "-";
+      document.getElementById('rec-tot-ma').innerText = (totMa !== null) ? totMa.toFixed(2) + " /40" : "-";
+      document.getElementById('rec-tot-pc').innerText = (totPc !== null) ? totPc.toFixed(2) + " /40" : "-";
+      document.getElementById('rec-tot-an').innerText = (totAn !== null) ? totAn.toFixed(2) + " /40" : "-";
+
+      if(totFr !== null && totMa !== null && totPc !== null && totAn !== null) {
+        // Coefs : Fr (2), Ma (2), PC (1), An (1) -> Total Coefs = 6.
+        // Chaque total est sur /40 (Note/20 MA + Note/20 BEPC).
+        // La somme pondérée divisée par (6 * 2) redonne directement la moyenne d'orientation globale /20.
+        const totalPondere = (totFr * 2) + (totMa * 2) + (totPc * 1) + (totAn * 1);
+        const moyOrientation = totalPondere / 12;
+
+        document.getElementById('orient-score-val').innerText = moyOrientation.toFixed(2) + " / 20";
+        
+        let app = "Moyenne calculée avec succès !";
+        if(moyOrientation >= 14) app = "Excellente moyenne d'orientation ! 🟢";
+        else if(moyOrientation >= 10) app = "Félicitations, vous avez la moyenne d'orientation ! 🟡";
+        else app = "Attention, moyenne d'orientation insuffisante. 🔴";
+        
+        document.getElementById('orient-appreciation-lbl').innerText = app;
+      } else {
+        document.getElementById('orient-score-val').innerText = "-- / 20";
+        document.getElementById('orient-appreciation-lbl').innerText = "Renseignez vos notes BEPC et validez tous les trimestres.";
+      }
+    }
+
+    /* GESTION DES MODALES POPUP */
+    function openModal(title, bodyHtml) {
+      document.getElementById('modal-title-text').innerText = title;
+      document.getElementById('modal-body-content').innerHTML = bodyHtml;
+      document.getElementById('modal-container').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-container').classList.remove('active');
+    }
+
+    function openModalCreator() {
+      const creatorHtml = `
+        <div style="text-align:center; padding:10px 0;">
+          <img src="https://i.postimg.cc/HjDJvjqX/file-00000000685081f4afaf53efdfb26e58.png" class="creator-photo-ring" alt="Créateur ZTV" />
+          <h3 style="font-size:16px; font-weight:900; color:#FFF;">Zakaria Niampa</h3>
+          <p style="font-size:11px; color:var(--orange-ztv); font-weight:800; margin-top:2px;">Fondateur & Développeur Principal</p>
+          <div style="margin-top:14px; background:var(--bg-input); padding:12px; border-radius:var(--radius-lg); border:1px solid var(--border-light); text-align:left;">
+            <p style="font-size:11px; color:#E2E8F0; line-height:1.5;">
+              <strong>ZTV Moyenne</strong> a été conçue pour faciliter le suivi scolaire des élèves et simplifier le calcul de leurs performances annuelles ainsi que l'orientation.
+            </p>
+          </div>
+          <a href="https://wa.me/2250799591024" target="_blank" class="btn-main-green" style="margin-top:16px; text-decoration:none;">
+            <span>💬 Contacter sur WhatsApp</span>
+          </a>
+        </div>
+      `;
+      openModal("👑 À propos du Créateur", creatorHtml);
+    }
+  </script>
+</body>
+</html>
