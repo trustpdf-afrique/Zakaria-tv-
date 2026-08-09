@@ -1,2791 +1,594 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZTV - Plateforme Educative & Concours</title>
-    <!-- Google Fonts & FontAwesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ZTV Moyenne</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-main: #090D1A;
+      --bg-card: #1B2133;
+      --bg-input: #111827;
+      --border-light: #2A344A;
+
+      --orange-ztv: #FF8C00;
+      --green-ztv: #09A63D;
+      --white: #FFFFFF;
+      --text-gray: #9CA3AF;
+
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-pill: 9999px;
+
+      --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --glow-orange: 0 0 20px rgba(255, 140, 0, 0.4);
+      --glow-green: 0 0 20px rgba(9, 166, 61, 0.4);
+
+      --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background-color: #03060D;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--white);
+    }
+
+    /* CHÂSSIS APPLICATION MOBILE */
+    .app-frame {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      max-height: 920px;
+      background-color: var(--bg-main);
+      position: relative;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 60px rgba(0,0,0,0.95);
+      border-radius: 0px;
+    }
+
+    .app-frame::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, 
+        rgba(255, 140, 0, 0.05) 0%, 
+        rgba(255, 255, 255, 0.02) 50%, 
+        rgba(9, 166, 61, 0.05) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @media (min-width: 450px) {
+      .app-frame {
+        border-radius: 36px;
+        height: 94vh;
+        border: 2px solid var(--border-light);
+      }
+    }
+
+    /* TRANSITIONS & PAGES */
+    .page-view {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      min-height: 100%;
+      padding-bottom: 40px;
+      z-index: 1;
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    .page-view.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* LOGO & BRANDING */
+    .ztv-logo-brand {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* EN-TÊTE AUTHENTIFICATION */
+    .auth-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(9, 13, 26, 0.8);
+    }
+
+    .btn-creator-top {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      color: var(--white);
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-creator-top:active { transform: scale(0.96); }
+
+    .header-divider-line {
+      width: 100%;
+      height: 2px;
+      background: var(--orange-ztv);
+      box-shadow: var(--glow-orange);
+    }
+
+    /* CARTE DE PRÉSENTATION */
+    .presentation-card {
+      margin: 16px 20px;
+      background: linear-gradient(135deg, rgba(9, 166, 61, 0.35) 0%, rgba(255, 140, 0, 0.35) 100%), var(--bg-card);
+      border: 1.5px solid var(--orange-ztv);
+      border-radius: var(--radius-xl);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .presentation-logo {
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+    }
+
+    .presentation-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: -0.3px;
+    }
+
+    .presentation-subtitle {
+      font-size: 11px;
+      font-weight: 600;
+      color: #E2E8F0;
+      margin-top: 5px;
+      line-height: 1.35;
+    }
+
+    /* CARTE DE CONNEXION / INSCRIPTION */
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      margin: 0 20px;
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+    }
+
+    /* ONGLETS (TABS) */
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 22px;
+      background: var(--bg-input);
+      padding: 5px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-light);
+    }
+
+    .tab-btn {
+      padding: 12px;
+      border-radius: var(--radius-pill);
+      border: none;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      color: var(--white);
+      background: transparent;
+    }
+
+    .tab-btn.active {
+      background: var(--orange-ztv);
+      color: #000;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: var(--glow-orange);
+    }
+
+    /* FORMULAIRES */
+    .form-grid-dual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .form-input::placeholder { color: var(--text-gray); font-weight: 500; }
+    .form-input:focus { border-color: var(--orange-ztv); box-shadow: 0 0 12px rgba(255, 140, 0, 0.25); }
+    select.form-input { appearance: none; cursor: pointer; }
+
+    /* ERROR MESSAGE FORM */
+    .auth-error-msg {
+      color: #EF4444;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+      line-height: 1.3;
+    }
+
+    /* BOUTON SELECTION PHOTO GALERIE */
+    .btn-photo-gallery {
+      width: 100%;
+      background: linear-gradient(135deg, #1F293D 0%, #111827 100%);
+      border: 1.5px dashed var(--orange-ztv);
+      color: #FFF;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: var(--transition);
+      text-align: center;
+    }
+    .btn-photo-gallery:hover { background: rgba(255, 140, 0, 0.1); }
+
+    /* BOUTON PRINCIPAL VERT */
+    .btn-main-green {
+      background: var(--green-ztv);
+      color: var(--white);
+      font-weight: 800;
+      font-size: 15px;
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 16px;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: var(--glow-green);
+      transition: var(--transition);
+      margin-top: 10px;
+    }
+    .btn-main-green:active { transform: scale(0.97); }
+
+    .forgot-link {
+      display: block; text-align: center; color: var(--text-gray);
+      font-size: 12px; font-weight: 600; margin-top: 16px;
+      text-decoration: none; transition: var(--transition);
+    }
+    .forgot-link:hover { color: var(--white); }
+
+    /* BOUTON FLOTTANT WHATSAPP */
+    .whatsapp-float-btn {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 56px; height: 56px; background: #25D366;
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+      z-index: 1000; cursor: pointer; transition: var(--transition); text-decoration: none;
+    }
+    .whatsapp-float-btn:active { transform: scale(0.9); }
+
+    /* ================= DASHBOARD STYLES ================= */
+    .dash-header {
+      padding: 20px; display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(180deg, rgba(27, 33, 51, 0.8) 0%, rgba(9, 13, 26, 0) 100%);
+    }
+    .user-profile-info { display: flex; align-items: center; gap: 12px; }
+    .user-avatar-circle {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 2px solid var(--orange-ztv); object-fit: cover; background: var(--bg-card);
+    }
+
+    /* SECTION DES 3 TRIMESTRES */
+    .trimestres-section { padding: 0 16px; margin-bottom: 16px; }
+    .trimestres-row-top { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .trimestres-row-bottom { display: flex; justify-content: center; }
+    .trimestres-row-bottom .trim-card { width: 100%; max-width: 220px; }
+
+    .trim-card {
+      border-radius: var(--radius-xl); padding: 16px; color: #FFF;
+      cursor: pointer; box-shadow: var(--shadow-card); transition: var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .trim-card:active { transform: scale(0.97); }
+    .trim-card-1 { 
+      background: linear-gradient(135deg, #FF8C00, #D96B00); 
+      border: 1.5px solid rgba(255, 215, 0, 0.6);
+      box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+    }
+    .trim-card-2 { 
+      background: #FFFDF9; 
+      color: #0F172A; 
+      border: 1.5px solid #E2E8F0;
+    }
+    .trim-card-3 { 
+      background: linear-gradient(135deg, #09A63D, #00803E); 
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 15px rgba(9, 166, 61, 0.3);
+    }
+
+    .trim-header-flex { display: flex; justify-content: space-between; align-items: center; }
+    .trim-title-box { display: flex; align-items: center; gap: 6px; }
+    .trim-title { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+    .trim-sublbl { font-size: 10px; font-weight: 700; opacity: 0.85; margin-top: 4px; }
+    .trim-val { font-size: 19px; font-weight: 900; margin-top: 4px; }
+    .trim-arrow-circle {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #FFFFFF; color: #0F172A; display: flex; align-items: center; justify-content: center; 
+      font-size: 12px; font-weight: 900; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .trim-card-2 .trim-arrow-circle { background: #0F172A; color: #FFF; }
+
+    .annual-card-ztv {
+      background: #FFFFFF; border-radius: var(--radius-xl);
+      padding: 18px; margin: 0 16px 16px; color: #0F172A; box-shadow: var(--shadow-card);
+    }
+    .annual-top-title {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      color: var(--green-ztv); font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 14px;
+    }
+    .annual-stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      text-align: center; border-top: 1px solid #E2E8F0; padding-top: 12px;
+    }
+    .annual-stat-lbl { font-size: 10px; color: #64748B; font-weight: 700; text-transform: uppercase; }
+    .annual-stat-val { font-size: 18px; font-weight: 900; margin-top: 4px; color: #0F172A; }
+
+    .progression-card-ztv {
+      background: #FFFFFF; border-radius: var(--radius-xl); padding: 16px 20px;
+      margin: 0 16px 16px; color: #0F172A; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-card);
+    }
+    .prog-circle {
+      width: 56px; height: 56px; border-radius: 50%; border: 5px solid #EF4444;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 14px; color: #0F172A; flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .prog-bar-bg { width: 100%; height: 8px; background: #E2E8F0; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+    .prog-bar-fill { height: 100%; width: 0%; background: #EF4444; border-radius: 4px; transition: all 0.5s ease; }
+
+    .objective-banner {
+      background: linear-gradient(135deg, #FF8C00, #D95300);
+      border-radius: var(--radius-lg); padding: 14px 18px; margin: 0 16px 16px; color: #FFF;
+      display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: var(--transition);
+    }
+    .objective-banner:active { transform: scale(0.98); }
+
+    /* BOUTON ORIENTATION 3EME */
+    .orientation-card-3eme {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+      border: 1.5px solid #818CF8;
+      border-radius: var(--radius-xl);
+      padding: 16px 20px;
+      margin: 0 16px 16px;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(49, 46, 129, 0.4);
+      transition: var(--transition);
+    }
+    .orientation-card-3eme:active { transform: scale(0.97); }
+
+    /* BOUTONS PASTILLES PREMIUM DU BAS (PROFIL PUIS TABLEAU D'HONNEUR) */
+    .bottom-dual-btns { display: flex; flex-direction: column; gap: 12px; padding: 0 16px; margin-bottom: 20px; }
     
-    <!-- Firebase SDKs v8 -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-    <style>
-        :root {
-            /* Palette aux couleurs de la Côte d'Ivoire */
-            --civ-orange: #FF8200;
-            --civ-orange-hover: #E07000;
-            --civ-white: #FFFFFF;
-            --civ-green: #009A44;
-            --civ-green-hover: #007D37;
-            
-            --bg-dark: #0A0D18;
-            --card-bg: #161D2F;
-            --card-alt: #0F1524;
-            --text-main: #FFFFFF;
-            --text-sub: #94A3B8;
-            --border: #26334D;
-            --danger: #EF4444;
-            --info: #3B82F6;
-            
-            --radius-lg: 16px;
-            --radius-md: 10px;
-            --radius-sm: 6px;
-            --shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding-bottom: 40px;
-        }
-
-        /* --- Header / Navigation --- */
-        .navbar {
-            height: 65px;
-            background-color: rgba(10, 13, 24, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--civ-orange);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.25rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 800;
-            font-size: 1.15rem;
-        }
-
-        .logo-img {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid var(--civ-orange);
-            box-shadow: 0 0 10px rgba(255, 130, 0, 0.4);
-        }
-
-        /* --- Toast Notification Vert Moderne (Haut Droite) --- */
-        .toast-container {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast-green {
-            background: linear-gradient(135deg, var(--civ-green), #005F28);
-            color: var(--civ-white);
-            padding: 12px 20px;
-            border-radius: var(--radius-md);
-            box-shadow: 0 10px 25px rgba(0, 154, 68, 0.4);
-            border-left: 5px solid var(--civ-white);
-            font-weight: 700;
-            font-size: 0.88rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideInRight 0.3s ease forwards, fadeOut 0.4s ease 3.6s forwards;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-10px); }
-        }
-
-        /* --- Layout & Base --- */
-        .container {
-            max-width: 950px;
-            margin: 1.2rem auto 0;
-            padding: 0 0.8rem;
-        }
-
-        .view-section {
-            display: none;
-        }
-        .view-section.active {
-            display: block;
-            animation: fadeIn 0.25s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            box-shadow: var(--shadow);
-            margin-bottom: 1.2rem;
-        }
-
-        /* Buttons CIV Theme */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.82rem;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        .btn-orange {
-            background: linear-gradient(135deg, var(--civ-orange), var(--civ-orange-hover));
-            color: #000;
-            box-shadow: 0 3px 12px rgba(255, 130, 0, 0.3);
-        }
-        .btn-orange:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(255, 130, 0, 0.45);
-        }
-
-        .btn-green {
-            background: linear-gradient(135deg, var(--civ-green), var(--civ-green-hover));
-            color: var(--civ-white);
-            box-shadow: 0 3px 12px rgba(0, 154, 68, 0.3);
-        }
-        .btn-green:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(0, 154, 68, 0.45);
-        }
-
-        .btn-secondary {
-            background-color: var(--card-alt);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
-        .btn-secondary:hover {
-            border-color: var(--civ-orange);
-            background-color: rgba(255, 130, 0, 0.08);
-        }
-        .btn-secondary.active {
-            border-color: var(--civ-orange);
-            background-color: var(--civ-orange);
-            color: #000;
-        }
-
-        .btn-back {
-            background-color: rgba(255, 255, 255, 0.04);
-            color: var(--text-sub);
-            border: 1px solid var(--border);
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            margin-bottom: 0.8rem;
-        }
-        .btn-back:hover {
-            color: var(--text-main);
-            border-color: var(--civ-orange);
-        }
-
-        .btn-danger {
-            background-color: rgba(239, 68, 68, 0.12);
-            color: var(--danger);
-            border: 1px solid var(--danger);
-        }
-        .btn-danger:hover {
-            background-color: var(--danger);
-            color: #fff;
-        }
-
-        .btn-audio {
-            background-color: rgba(255, 130, 0, 0.15);
-            color: var(--civ-orange);
-            border: 1px solid var(--civ-orange);
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            padding: 0;
-            font-size: 1.15rem;
-        }
-
-        .btn-block { width: 100%; }
-
-        .form-group { margin-bottom: 1rem; }
-        .form-label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-sub);
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px 14px;
-            background-color: var(--card-alt);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            color: var(--text-main);
-            font-size: 0.9rem;
-            outline: none;
-        }
-        .form-control:focus { border-color: var(--civ-orange); }
-
-        /* --- Banner & Profiles --- */
-        .participant-banner {
-            background: linear-gradient(135deg, #004D22 0%, #0F1524 50%, #804100 100%);
-            border: 1px solid var(--civ-orange);
-            border-radius: var(--radius-lg);
-            padding: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 1.2rem;
-            position: relative;
-        }
-        .profile-thumb {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--civ-orange);
-            box-shadow: 0 0 12px rgba(255, 130, 0, 0.5);
-            flex-shrink: 0;
-        }
-
-        /* --- Stat Pills --- */
-        .stats-pills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 0.75rem;
-            margin-bottom: 1.2rem;
-        }
-        .stat-pill {
-            background: linear-gradient(145deg, var(--card-bg), var(--card-alt));
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            padding: 8px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .stat-pill-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(255, 130, 0, 0.15);
-            color: var(--civ-orange);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-        }
-        .stat-pill-val { font-size: 1.1rem; font-weight: 800; color: var(--text-main); line-height: 1; }
-        .stat-pill-lbl { font-size: 0.68rem; color: var(--text-sub); font-weight: 600; text-transform: uppercase; }
-
-        /* --- Contests & Badges --- */
-        .contest-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        .contest-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .contest-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            margin: 0.4rem 0 0.8rem;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 700;
-        }
-        .badge-online { background: rgba(0, 154, 68, 0.2); color: #00FF66; border: 1px solid var(--civ-green); }
-        .badge-offline { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-        .badge-free { background: rgba(59, 130, 246, 0.2); color: var(--info); border: 1px solid var(--info); }
-        .badge-paid { background: rgba(255, 130, 0, 0.2); color: var(--civ-orange); border: 1px solid var(--civ-orange); }
-        .badge-class { background: rgba(255, 255, 255, 0.1); color: var(--civ-white); border: 1px solid var(--border); }
-
-        /* --- Chronomètre 30s Rouge --- */
-        .timer-box-red {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #FFFFFF;
-            text-align: center;
-            background: linear-gradient(135deg, #EF4444, #991B1B);
-            border: 2px solid #F87171;
-            border-radius: var(--radius-md);
-            padding: 8px 24px;
-            width: fit-content;
-            margin: 0 auto 1.2rem;
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
-            animation: pulse 1s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.04); }
-        }
-
-        /* --- Grand Cercle des Points --- */
-        .circle-points-container {
-            width: 170px;
-            height: 170px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--civ-orange), var(--civ-green));
-            padding: 5px;
-            margin: 1rem auto;
-            box-shadow: 0 0 25px rgba(255, 130, 0, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .circle-points-inner {
-            width: 100%;
-            height: 100%;
-            background: var(--card-alt);
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .option-box {
-            background-color: var(--card-alt);
-            border: 2px solid var(--border);
-            color: var(--text-main);
-            padding: 14px 18px;
-            border-radius: var(--radius-md);
-            width: 100%;
-            text-align: left;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 0.8rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .option-box:hover { border-color: var(--civ-orange); background-color: rgba(255, 130, 0, 0.08); }
-        .option-box.selected { border-color: var(--civ-orange); background-color: rgba(255, 130, 0, 0.22); }
-
-        /* --- Modals & Tables --- */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 0.8rem;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            width: 100%;
-            max-width: 650px;
-            padding: 1.25rem;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 0.8rem;
-            font-size: 0.82rem;
-        }
-        .data-table th, .data-table td {
-            padding: 9px 10px;
-            border-bottom: 1px solid var(--border);
-            text-align: left;
-        }
-        .data-table th { color: var(--civ-orange); font-size: 0.7rem; text-transform: uppercase; }
-
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 0.8rem;
-            flex-wrap: wrap;
-        }
-
-        /* --- Bouton d'Assistance WhatsApp Flottant (Rond) --- */
-        .whatsapp-float {
-            position: fixed;
-            width: 55px;
-            height: 55px;
-            bottom: 25px;
-            right: 25px;
-            background-color: #25d366;
-            color: #FFF;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 30px;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.4);
-            z-index: 1500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: transform 0.2s ease;
-        }
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Container Toast Notifications Vertes -->
-    <div class="toast-container" id="toast-container"></div>
-
-    <!-- Bouton d'Assistance WhatsApp (Visible Uniquement pour les Participants / Élèves) -->
-    <a href="https://wa.me/2250799591024" class="whatsapp-float" id="whatsapp-btn" target="_blank" title="Assistance WhatsApp" style="display: none;">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
-
-    <!-- Barre supérieure de navigation -->
-    <nav class="navbar">
-        <a href="#" class="brand-logo">
-            <img src="https://i.postimg.cc/3NmBfMMB/1000280085-1024x1024.png" alt="ZTV Logo" class="logo-img">
-            <span>ZTV</span>
-        </a>
-        <div style="display: flex; gap: 8px;">
-            <button class="btn btn-secondary" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openCreatorModal()">
-                <i class="fa-solid fa-user-astronaut" style="color:var(--civ-orange);"></i> Créateur de l'application
-            </button>
-        </div>
-    </nav>
-
-    <div class="container">
-
-        <!-- =================================================================== -->
-        <!-- 1. ADMINISTRATION                                                   -->
-        <!-- =================================================================== -->
-        
-        <!-- Connexion Admin (Identifiants : ZakariaTV / 55250031) -->
-        <section id="admin-login-view" class="view-section active">
-            <div style="max-width: 380px; margin: 2rem auto;">
-                <div class="card" style="text-align: center;">
-                    <img src="https://i.postimg.cc/3NmBfMMB/1000280085-1024x1024.png" style="width:70px; height:70px; border-radius:12px; margin-bottom:0.8rem; border:2px solid var(--civ-orange);">
-                    <h3>Espace Administration</h3>
-                    <p style="color: var(--text-sub); font-size: 0.8rem; margin-top: 4px; margin-bottom: 1.2rem;">Plateforme Éducative ZTV</p>
-                    
-                    <form onsubmit="handleAdminLogin(event)">
-                        <div class="form-group">
-                            <label class="form-label">Identifiant</label>
-                            <input type="text" id="admin-user" class="form-control" placeholder="ZakariaTV" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Mot de passe</label>
-                            <input type="password" id="admin-pass" class="form-control" placeholder="••••••••" required>
-                        </div>
-                        <button type="submit" class="btn btn-orange btn-block">
-                            Se connecter <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- Tableau de Bord Admin -->
-        <section id="admin-dashboard-view" class="view-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;">
-                <button class="btn btn-back" style="margin: 0;" onclick="showView('admin-login-view')">
-                    <i class="fa-solid fa-power-off"></i> Déconnexion
-                </button>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-danger" onclick="resetAllData()"><i class="fa-solid fa-rotate-left"></i> Tout réinitialiser</button>
-                    <button class="btn btn-green" onclick="openCreateContestModal()"><i class="fa-solid fa-plus"></i> Créer Concours</button>
-                </div>
-            </div>
-
-            <!-- PASTILLES STATISTIQUES -->
-            <div class="stats-pills-grid">
-                <div class="stat-pill">
-                    <div class="stat-pill-icon"><i class="fa-solid fa-trophy"></i></div>
-                    <div>
-                        <div class="stat-pill-val" id="stat-contests">0</div>
-                        <div class="stat-pill-lbl">Concours</div>
-                    </div>
-                </div>
-                <div class="stat-pill">
-                    <div class="stat-pill-icon" style="color:var(--civ-green); background:rgba(0,154,68,0.15);"><i class="fa-solid fa-users"></i></div>
-                    <div>
-                        <div class="stat-pill-val" id="stat-users">0</div>
-                        <div class="stat-pill-lbl">Comptes créés</div>
-                    </div>
-                </div>
-                <div class="stat-pill">
-                    <div class="stat-pill-icon" style="color:var(--info); background:rgba(59,130,246,0.15);"><i class="fa-solid fa-chart-simple"></i></div>
-                    <div>
-                        <div class="stat-pill-val" id="stat-participations">0</div>
-                        <div class="stat-pill-lbl">Tests joués</div>
-                    </div>
-                </div>
-                <div class="stat-pill">
-                    <div class="stat-pill-icon" style="color:#8B5CF6; background:rgba(139,92,246,0.15);"><i class="fa-solid fa-key"></i></div>
-                    <div>
-                        <div class="stat-pill-val" id="stat-resets">0</div>
-                        <div class="stat-pill-lbl">Mdp Oubliés</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lien Unique d'Accès Élèves -->
-            <div class="card" style="border: 1px solid var(--civ-orange); padding: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="font-size: 0.9rem;"><i class="fa-solid fa-link" style="color: var(--civ-orange);"></i> Lien Unique d'Accès Élèves</h4>
-                    <span style="font-size: 0.7rem; background: rgba(255,130,0,0.2); color: var(--civ-orange); padding: 2px 8px; border-radius: 20px; font-weight:700;">ACCÈS UNIQUE</span>
-                </div>
-                <div style="display: flex; gap: 8px; background: var(--card-alt); padding: 6px 10px; border-radius: var(--radius-md); border: 1px solid var(--border);">
-                    <input type="text" value="" id="unique-share-link" readonly style="background:none; border:none; color:var(--text-main); width:100%; outline:none; font-family:monospace; font-size:0.8rem;">
-                    <button class="btn btn-orange" style="padding: 4px 12px; font-size: 0.75rem;" onclick="copyUniqueLink()">
-                        <i class="fa-solid fa-copy"></i> Copier
-                    </button>
-                </div>
-            </div>
-
-            <!-- Boutons de Gestion Administrateur -->
-            <div style="display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap;">
-                <button class="btn btn-secondary" onclick="openAdminUsersModal()"><i class="fa-solid fa-users"></i> Comptes créés (<span id="users-count-badge">0</span>)</button>
-                <button class="btn btn-orange" onclick="openTop10ModalAdmin()"><i class="fa-solid fa-trophy"></i> Top 10 des meilleurs élèves</button>
-                <button class="btn btn-green" onclick="openGeneralRankingModalAdmin()"><i class="fa-solid fa-list-ol"></i> Classement général</button>
-                <button class="btn btn-secondary" onclick="openAdminResultsModal()"><i class="fa-solid fa-square-poll-vertical"></i> Résultats & Statistiques</button>
-                <button class="btn btn-secondary" onclick="openAdminResetsModal()"><i class="fa-solid fa-key"></i> Mots de passe (<span id="reset-badge-count">0</span>)</button>
-                <button class="btn btn-secondary" onclick="openAdminSubscriptionModal()"><i class="fa-solid fa-crown" style="color:var(--civ-orange);"></i> Abonnements (<span id="sub-badge-count">0</span>)</button>
-            </div>
-
-            <!-- Liste des Concours Administrateur -->
-            <div class="card">
-                <h4 style="margin-bottom: 0.8rem;">Concours configurés</h4>
-                <div id="admin-contest-list" class="contest-grid"></div>
-            </div>
-
-            <!-- Avis Utilisateurs Admin (Avec Date & Nom) -->
-            <div class="card">
-                <h4 style="font-size:0.9rem;"><i class="fa-solid fa-star" style="color: var(--civ-orange);"></i> Tous les Avis & Retours Élèves</h4>
-                <div id="admin-reviews-list" style="margin-top: 0.6rem; max-height: 220px; overflow-y: auto;"></div>
-            </div>
-        </section>
-
-        <!-- =================================================================== -->
-        <!-- 2. PORTAIL PARTICIPANT                                              -->
-        <!-- =================================================================== -->
-
-        <!-- Inscription / Connexion Élève -->
-        <section id="participant-auth-view" class="view-section">
-            <div class="participant-banner">
-                <img src="https://i.postimg.cc/3NmBfMMB/1000280085-1024x1024.png" alt="ZTV Logo" class="profile-thumb">
-                <div>
-                    <h2 style="font-size: 1.3rem;">ZTV Concours</h2>
-                    <p style="color: var(--civ-orange); font-size: 0.82rem; font-weight: 700;">Plateforme éducative aux couleurs de la Côte d'Ivoire</p>
-                </div>
-            </div>
-
-            <div class="card" style="max-width: 440px; margin: 0 auto;">
-                <div style="display: flex; gap: 8px; margin-bottom: 1.2rem;">
-                    <button class="btn btn-orange btn-block" id="tab-login-btn" onclick="switchAuthTab('login')">Se connecter</button>
-                    <button class="btn btn-secondary btn-block" id="tab-register-btn" onclick="switchAuthTab('register')">S'inscrire</button>
-                </div>
-
-                <!-- Connexion -->
-                <form id="participant-login-form" onsubmit="handleParticipantLogin(event)">
-                    <div class="form-group">
-                        <label class="form-label">Numéro WhatsApp</label>
-                        <input type="tel" id="part-login-phone" class="form-control" placeholder="+225..." required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Mot de passe</label>
-                        <input type="password" id="part-login-pass" class="form-control" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn btn-green btn-block">
-                        Accéder aux Concours <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                    <div style="text-align: center; margin-top: 0.8rem;">
-                        <a href="#" style="color: var(--text-sub); font-size: 0.78rem; text-decoration: none;" onclick="openForgotPasswordModal()">Mot de passe oublié ?</a>
-                    </div>
-                </form>
-
-                <!-- Inscription avec Champ Établissement Scolaire et Classe -->
-                <form id="participant-register-form" onsubmit="handleParticipantRegister(event)" style="display: none;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <div class="form-group">
-                            <label class="form-label">Nom</label>
-                            <input type="text" id="part-reg-lastname" class="form-control" placeholder="Kouassi" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Prénom</label>
-                            <input type="text" id="part-reg-firstname" class="form-control" placeholder="Jean" required>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <div class="form-group">
-                            <label class="form-label">Ville</label>
-                            <input type="text" id="part-reg-city" class="form-control" placeholder="Abidjan" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Pays</label>
-                            <input type="text" id="part-reg-country" class="form-control" value="Côte d'Ivoire" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Établissement Scolaire</label>
-                        <input type="text" id="part-reg-school" class="form-control" placeholder="Ex: Lycée Moderne de Bangolo" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Classe Scolaire</label>
-                        <select id="part-reg-class" class="form-control" required>
-                            <option value="CE2">CE2</option>
-                            <option value="CM1">CM1</option>
-                            <option value="CM2">CM2</option>
-                            <option value="6e">6e</option>
-                            <option value="5e">5e</option>
-                            <option value="4e">4e</option>
-                            <option value="3e" selected>3e</option>
-                            <option value="Seconde">Seconde</option>
-                            <option value="Première">Première</option>
-                            <option value="Terminale">Terminale</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Numéro WhatsApp</label>
-                        <input type="tel" id="part-reg-phone" class="form-control" placeholder="+225..." required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Lien / URL Photo de profil (Optionnel)</label>
-                        <input type="url" id="part-reg-avatar" class="form-control" placeholder="https://...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Mot de passe</label>
-                        <input type="password" id="part-reg-pass" class="form-control" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn btn-green btn-block">
-                        Créer mon compte <i class="fa-solid fa-check"></i>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <!-- Tableau de Bord Élève -->
-        <section id="participant-home-view" class="view-section">
-            <div class="participant-banner">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80" alt="Avatar" class="profile-thumb" id="home-user-avatar">
-                <div style="flex:1;">
-                    <h2 style="font-size: 1.2rem;" id="user-display-name">Bienvenue Élève</h2>
-                    <p style="color: var(--text-sub); font-size: 0.8rem;" id="user-display-details">Établissement - Classe</p>
-                    
-                    <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
-                        <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="openProfileModal()"><i class="fa-solid fa-user-gear" style="color:var(--civ-orange);"></i> Mon Profil</button>
-                        <button class="btn btn-orange" style="padding:4px 10px; font-size:0.75rem;" onclick="openTop10Modal()"><i class="fa-solid fa-trophy"></i> Top 10 des meilleurs élèves</button>
-                        <button class="btn btn-green" style="padding:4px 10px; font-size:0.75rem;" onclick="openGeneralRankingModal()"><i class="fa-solid fa-list-ol"></i> Classement général</button>
-                        <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="openMyContestsModal()"><i class="fa-solid fa-chart-line" style="color:var(--civ-green);"></i> Mes concours</button>
-                        <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="openReviewModal()"><i class="fa-solid fa-comment"></i> Avis</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Espace Abonnement -->
-            <div class="card" style="background: linear-gradient(135deg, rgba(255, 130, 0, 0.1), rgba(0, 154, 68, 0.1)); border: 1px solid var(--civ-orange); padding: 1rem; margin-bottom: 1.2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <div>
-                        <h4 style="font-size: 0.95rem; color: var(--civ-orange);"><i class="fa-solid fa-gem"></i> Espace Abonnement</h4>
-                        <p style="font-size: 0.78rem; color: var(--text-sub); margin-top: 2px;">Accédez aux concours Premium et révisions illimitées.</p>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span id="user-sub-status-badge" style="background: var(--card-alt); border:1px solid var(--border); color: #FFF; font-weight: 800; font-size: 0.7rem; padding: 4px 10px; border-radius: 20px;">STATUT : GRATUIT</span>
-                        <button class="btn btn-green" style="padding:4px 12px; font-size:0.75rem;" onclick="openBuySubscriptionModal()"><i class="fa-solid fa-crown"></i> Acheter un abonnement</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filtrage Concours -->
-            <div class="card" style="padding: 0.8rem 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                    <h4 style="font-size: 1rem;">Concours disponibles</h4>
-                    <button class="btn btn-back" style="margin:0; padding:4px 10px; font-size:0.75rem;" onclick="logoutUser()">
-                        <i class="fa-solid fa-power-off"></i> Déconnexion
-                    </button>
-                </div>
-
-                <div class="filter-bar">
-                    <button class="btn btn-secondary active" id="filter-cat-all" onclick="setCategoryFilter('Tous')">Tous</button>
-                    <button class="btn btn-secondary" id="filter-cat-primaire" onclick="setCategoryFilter('Primaire')">Primaire</button>
-                    <button class="btn btn-secondary" id="filter-cat-college" onclick="setCategoryFilter('Collège')">Collège</button>
-                </div>
-
-                <div class="filter-bar" id="subcategories-filter-bar" style="display: none;"></div>
-            </div>
-
-            <div id="participant-contest-list" class="contest-grid"></div>
-        </section>
-
-        <!-- Attente 20s -->
-        <section id="participant-waiting-view" class="view-section">
-            <div class="card" style="text-align: center; max-width: 420px; margin: 2rem auto;">
-                <i class="fa-solid fa-stopwatch" style="font-size: 2.5rem; color: var(--civ-orange); margin-bottom: 0.8rem;"></i>
-                <h3>Préparation au test</h3>
-                <p style="color: var(--text-sub); font-size: 0.85rem; margin: 0.5rem 0 1rem;">
-                    Début dans <strong>20 secondes</strong>. Soyez prêt !
-                </p>
-                <div class="timer-box-red" id="wait-countdown">20</div>
-                <button class="btn btn-secondary btn-block" onclick="cancelWaiting()">
-                    <i class="fa-solid fa-xmark"></i> Annuler
-                </button>
-            </div>
-        </section>
-
-        <!-- Quiz avec Chronomètre 30s & Lecture Vocale Continue -->
-        <section id="participant-quiz-view" class="view-section">
-            <button class="btn btn-back" onclick="confirmExitQuiz()">
-                <i class="fa-solid fa-arrow-left"></i> Quitter
-            </button>
-
-            <div class="card" style="max-width: 650px; margin: 0 auto; text-align: center;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                    <span style="color: var(--text-sub); font-weight: 700; font-size: 0.85rem;" id="quiz-progress">Question 1 / 10</span>
-                    <button class="btn btn-audio" onclick="playAudioQuestion()" title="Écouter automatiquement la question puis les réponses A, B, C, D">
-                        <i class="fa-solid fa-volume-high"></i>
-                    </button>
-                </div>
-
-                <!-- Chronomètre rouge 30s -->
-                <div class="timer-box-red" id="question-timer">30</div>
-
-                <h2 id="quiz-question-text" style="font-size: 1.25rem; margin-bottom: 1.5rem; line-height: 1.4; color: var(--text-main);"></h2>
-                
-                <div id="quiz-options-container" style="margin-bottom: 1rem;"></div>
-
-                <button class="btn btn-green btn-block" style="padding: 12px; font-size: 0.95rem;" onclick="submitAnswer()">
-                    Valider ma réponse <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </div>
-        </section>
-
-        <!-- Fin de Concours avec Bouton Correction -->
-        <section id="participant-finish-view" class="view-section">
-            <div class="card" style="text-align: center; max-width: 480px; margin: 2rem auto;">
-                <i class="fa-solid fa-circle-check" style="font-size: 3.5rem; color: var(--civ-green); margin-bottom: 1rem;"></i>
-                <h2>Concours Terminé !</h2>
-                <p style="color: var(--text-sub); font-size: 0.95rem; margin: 0.8rem 0 1.2rem; line-height: 1.5;">
-                    Merci d'avoir participé à ce concours.
-                </p>
-                <div style="background: var(--card-alt); padding: 1rem; border-radius: 10px; margin-bottom: 1.2rem; border: 1px solid var(--border);">
-                    <p style="font-size: 0.85rem; color: var(--text-sub);">Votre Note Finale :</p>
-                    <h1 style="color: var(--civ-orange); font-size: 2.5rem; font-weight: 800;" id="finish-score-display">0 / 10</h1>
-                    <p style="font-size: 0.78rem; color: var(--civ-green); font-weight: 700; margin-top: 4px;" id="finish-class-display">Classe : CE2</p>
-                </div>
-                <!-- Nouveau Bouton Voir la correction -->
-                <button class="btn btn-secondary btn-block" style="margin-bottom: 0.8rem; border-color: var(--civ-orange); color: var(--civ-orange);" onclick="openCorrectionModal()">
-                    📖 Voir la correction
-                </button>
-                <button class="btn btn-orange btn-block" onclick="showView('participant-home-view')">
-                    <i class="fa-solid fa-house"></i> Retour au tableau de bord
-                </button>
-            </div>
-        </section>
-
-    </div>
-
-    <!-- =================================================================== -->
-    <!-- MODALES                                                            -->
-    <!-- =================================================================== -->
-
-    <!-- Modale Correction du Concours -->
-    <div class="modal" id="modal-correction">
-        <div class="modal-content" style="max-width: 700px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="color: var(--civ-orange);"><i class="fa-solid fa-book-open"></i> Correction du Concours</h3>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-correction')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div id="correction-list-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.2rem;"></div>
-
-            <button class="btn btn-orange btn-block" onclick="closeModal('modal-correction'); showView('participant-home-view');">
-                🏠 Retour au tableau de bord
-            </button>
-        </div>
-    </div>
-
-    <!-- Modale Créateur de l'application (ZTV) -->
-    <div class="modal" id="modal-creator">
-        <div class="modal-content" style="max-width: 480px; text-align: center; border: 2px solid var(--civ-orange);">
-            <div style="display: flex; justify-content: flex-end;">
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-creator')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 1rem; align-items: center;">
-                <img src="https://i.postimg.cc/Ss5J8Kwk/file-000000009dc8724699d54da957936110.png" alt="Niampa Zakaria" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--civ-orange); box-shadow: 0 0 15px rgba(255, 130, 0, 0.5);">
-                <img src="https://i.postimg.cc/3NmBfMMB/1000280085-1024x1024.png" alt="ZTV Logo" style="width: 80px; height: 80px; border-radius: 16px; object-fit: cover; border: 2px solid var(--civ-green);">
-            </div>
-
-            <h2 style="color: var(--civ-orange); font-size: 1.4rem;">Niampa Zakaria</h2>
-            <p style="color: var(--civ-green); font-weight: 800; font-size: 0.9rem; margin-top: 2px;">Créateur de ZTV</p>
-
-            <div style="background: var(--card-alt); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin: 1rem 0; text-align: left; font-size: 0.88rem; line-height: 1.6;">
-                <p><i class="fa-solid fa-user-graduate" style="color:var(--civ-orange);"></i> <strong>Statut :</strong> Élève en classe de 3e</p>
-                <p><i class="fa-solid fa-school" style="color:var(--civ-orange);"></i> <strong>Établissement :</strong> Lycée Moderne de Bangolo ( CÔTE D'IVOIRE 🇨🇮 )</p>
-                <p><i class="fa-solid fa-cake-candles" style="color:var(--civ-orange);"></i> <strong>Âge :</strong> 15 ans</p>
-                <p><i class="fa-solid fa-video" style="color:var(--civ-orange);"></i> <strong>Activité :</strong> Créateur de contenus sur les phénomènes mystérieux</p>
-                <p><i class="fa-solid fa-tv" style="color:var(--civ-orange);"></i> <strong>Nom de marque :</strong> ZTV</p>
-                <p><i class="fa-brands fa-tiktok" style="color:var(--civ-orange);"></i> <strong>Compte TikTok :</strong> zakaria tv</p>
-            </div>
-
-            <p style="font-size: 0.8rem; color: var(--text-sub); font-style: italic;">« Plateforme éducative conçue pour inspirer et faire réussir la jeunesse ivoirienne. »</p>
-        </div>
-    </div>
-
-    <!-- Modale Top 10 des Meilleurs Élèves (Participant) -->
-    <div class="modal" id="modal-top10">
-        <div class="modal-content" style="max-width: 700px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h3 style="color: var(--civ-orange); font-size: 1.1rem;"><i class="fa-solid fa-trophy"></i> Top 10 des meilleurs élèves</h3>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-top10')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Rang</th>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Établissement</th>
-                            <th>Classe</th>
-                            <th>Ville</th>
-                            <th>Total Points</th>
-                        </tr>
-                    </thead>
-                    <tbody id="top10-table-body"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Classement Général (Participant) -->
-    <div class="modal" id="modal-general-ranking">
-        <div class="modal-content" style="max-width: 750px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h3 style="color: var(--civ-green); font-size: 1.1rem;"><i class="fa-solid fa-list-ol"></i> Classement Général</h3>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-general-ranking')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="filter-bar" style="margin-bottom: 1rem;">
-                <button class="btn btn-secondary active" id="btn-rank-mode-level" onclick="switchRankingTab('level')">Classement par niveau</button>
-                <button class="btn btn-secondary" id="btn-rank-mode-global" onclick="switchRankingTab('global')">Classement global</button>
-            </div>
-
-            <!-- Sous-filtres par niveau -->
-            <div id="ranking-level-select-box" style="margin-bottom: 1rem;">
-                <label class="form-label">Sélectionner la classe :</label>
-                <select id="ranking-class-select" class="form-control" onchange="renderParticipantLevelRanking()">
-                    <option value="CE2">CE2</option>
-                    <option value="CM1">CM1</option>
-                    <option value="CM2">CM2</option>
-                    <option value="6e">6e</option>
-                    <option value="5e">5e</option>
-                    <option value="4e">4e</option>
-                    <option value="3e" selected>3e</option>
-                    <option value="Seconde">Seconde</option>
-                    <option value="Première">Première</option>
-                    <option value="Terminale">Terminale</option>
-                </select>
-            </div>
-
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Rang</th>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Établissement</th>
-                            <th>Ville</th>
-                            <th>Classe</th>
-                            <th>Points Totaux</th>
-                        </tr>
-                    </thead>
-                    <tbody id="general-ranking-table-body"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Top 10 Admin -->
-    <div class="modal" id="modal-admin-top10">
-        <div class="modal-content" style="max-width: 800px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h4 style="color: var(--civ-orange);"><i class="fa-solid fa-trophy"></i> Top 10 des meilleurs élèves (Administration)</h4>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-admin-top10')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Rang</th>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Établissement</th>
-                            <th>Ville</th>
-                            <th>Classe</th>
-                            <th>Concours joués</th>
-                            <th>Total Points</th>
-                            <th>Moyenne</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-top10-table-body"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Classement Général Admin -->
-    <div class="modal" id="modal-admin-general-ranking">
-        <div class="modal-content" style="max-width: 850px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h4 style="color: var(--civ-green);"><i class="fa-solid fa-list-ol"></i> Classement Général (Administration)</h4>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-admin-general-ranking')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="filter-bar" style="margin-bottom: 1rem;">
-                <button class="btn btn-secondary active" id="btn-admin-rank-mode-level" onclick="switchAdminRankingTab('level')">Classement par niveau</button>
-                <button class="btn btn-secondary" id="btn-admin-rank-mode-global" onclick="switchAdminRankingTab('global')">Classement global</button>
-            </div>
-
-            <div id="admin-ranking-level-select-box" style="margin-bottom: 1rem;">
-                <label class="form-label">Sélectionner la classe :</label>
-                <select id="admin-ranking-class-select" class="form-control" onchange="renderAdminLevelRanking()">
-                    <option value="CE2">CE2</option>
-                    <option value="CM1">CM1</option>
-                    <option value="CM2">CM2</option>
-                    <option value="6e">6e</option>
-                    <option value="5e">5e</option>
-                    <option value="4e">4e</option>
-                    <option value="3e" selected>3e</option>
-                    <option value="Seconde">Seconde</option>
-                    <option value="Première">Première</option>
-                    <option value="Terminale">Terminale</option>
-                </select>
-            </div>
-
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Rang</th>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Établissement</th>
-                            <th>Ville</th>
-                            <th>Classe</th>
-                            <th>Concours joués</th>
-                            <th>Total Points</th>
-                            <th>Moyenne</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-general-ranking-table-body"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Tableau de bord personnel « Mes concours » -->
-    <div class="modal" id="modal-my-contests">
-        <div class="modal-content" style="max-width: 650px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h3 style="color: var(--civ-green); font-size: 1.1rem;"><i class="fa-solid fa-chart-pie"></i> Mes concours</h3>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-my-contests')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <!-- Grand Cercle Moderne des Points -->
-            <div class="circle-points-container">
-                <div class="circle-points-inner">
-                    <span style="font-size: 2.2rem; font-weight: 900; color: var(--civ-orange);" id="my-total-points">0</span>
-                    <span style="font-size: 0.68rem; font-weight: 800; color: var(--civ-green); text-transform: uppercase;">Points Totaux</span>
-                </div>
-            </div>
-
-            <p style="text-align: center; font-size: 0.82rem; color: var(--text-sub); margin-bottom: 1rem;">
-                Nombre total de concours effectués : <strong style="color:#FFF;" id="my-total-count">0</strong>
-            </p>
-
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Concours</th>
-                            <th>Classe</th>
-                            <th>Date</th>
-                            <th>Note /10</th>
-                            <th>Rang</th>
-                        </tr>
-                    </thead>
-                    <tbody id="my-contests-table-body"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Profil Élève -->
-    <div class="modal" id="modal-profile">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3><i class="fa-solid fa-user" style="color: var(--civ-orange);"></i> Mon Profil Participant</h3>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-profile')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div style="text-align: center; margin-bottom: 1.2rem;">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80" id="prof-modal-avatar" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--civ-orange); margin-bottom: 0.5rem; object-fit: cover;">
-                <h3 id="prof-name">Élève</h3>
-                <span id="prof-sub-badge" style="font-size: 0.75rem; color: var(--civ-green); background: rgba(0,154,68,0.15); padding: 2px 8px; border-radius: 20px;">Statut : Gratuit</span>
-            </div>
-            
-            <div style="background: var(--card-alt); padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 0.85rem; margin-bottom: 1rem;">
-                <p style="margin-bottom: 6px;"><strong>Nom :</strong> <span id="prof-lastname"></span></p>
-                <p style="margin-bottom: 6px;"><strong>Prénom :</strong> <span id="prof-firstname"></span></p>
-                <p style="margin-bottom: 6px;"><strong>Établissement :</strong> <span id="prof-school"></span></p>
-                <p style="margin-bottom: 6px;"><strong>Classe :</strong> <span id="prof-class"></span></p>
-                <p style="margin-bottom: 6px;"><strong>Ville / Pays :</strong> <span id="prof-location"></span></p>
-                <p style="margin-bottom: 6px;"><strong>Numéro WhatsApp :</strong> <span id="prof-phone"></span></p>
-            </div>
-
-            <!-- Formulaire Modification du Mot de passe -->
-            <div class="card" style="background: var(--card-alt); padding: 1rem;">
-                <h4 style="font-size: 0.85rem; margin-bottom: 0.8rem; color: var(--civ-orange);"><i class="fa-solid fa-lock"></i> Modifier mon mot de passe</h4>
-                <form onsubmit="handleChangePassword(event)">
-                    <div class="form-group">
-                        <label class="form-label">Mot de passe actuel</label>
-                        <input type="password" id="pass-curr" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nouveau mot de passe</label>
-                        <input type="password" id="pass-new" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Confirmation du nouveau mot de passe</label>
-                        <input type="password" id="pass-conf" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-green btn-block">Enregistrer</button>
-                </form>
-            </div>
-
-            <button class="btn btn-danger btn-block" style="margin-top: 1rem;" onclick="logoutUser()"><i class="fa-solid fa-power-off"></i> Se déconnecter</button>
-        </div>
-    </div>
-
-    <!-- Modale Mot de passe oublié -->
-    <div class="modal" id="modal-forgot-password">
-        <div class="modal-content" style="max-width: 400px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3><i class="fa-solid fa-key" style="color: var(--civ-orange);"></i> Mot de passe oublié</h3>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-forgot-password')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div id="forgot-step-1">
-                <div class="form-group">
-                    <label class="form-label">Saisissez votre numéro WhatsApp</label>
-                    <input type="tel" id="forgot-phone-input" class="form-control" placeholder="+225..." required>
-                </div>
-                <button class="btn btn-orange btn-block" onclick="verifyForgotPhone()">Rechercher mon compte</button>
-            </div>
-
-            <div id="forgot-step-2" style="display: none; text-align: center;">
-                <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 0.8rem;">Est-ce bien votre compte ?</p>
-                <div style="background: var(--card-alt); padding: 12px; border-radius: 10px; border: 1px solid var(--border); text-align: left; font-size: 0.85rem; margin-bottom: 1rem;">
-                    <p><strong>Nom :</strong> <span id="forgot-found-lastname"></span></p>
-                    <p><strong>Prénom :</strong> <span id="forgot-found-firstname"></span></p>
-                    <p><strong>Établissement :</strong> <span id="forgot-found-school"></span></p>
-                    <p><strong>Ville :</strong> <span id="forgot-found-city"></span></p>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-green btn-block" onclick="confirmResetRequest()">Oui, c'est moi</button>
-                    <button class="btn btn-secondary btn-block" onclick="closeModal('modal-forgot-password')">Annuler</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Édition / Création de Concours -->
-    <div class="modal" id="modal-edit-contest">
-        <div class="modal-content" style="max-width: 650px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h4 id="modal-contest-title">Créer un Concours (Analyse Automatique)</h4>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-edit-contest')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form onsubmit="handleSaveContest(event)">
-                <input type="hidden" id="edit-contest-id">
-                <div class="form-group">
-                    <label class="form-label">Titre du Concours</label>
-                    <input type="text" id="edit-title" class="form-control" placeholder="Ex: Histoire – La Révolution" required>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
-                    <div class="form-group">
-                        <label class="form-label">Catégorie</label>
-                        <select id="edit-category" class="form-control" onchange="updateLevelOptions()">
-                            <option value="Primaire">Primaire</option>
-                            <option value="Collège">Collège</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Classe Concernée</label>
-                        <select id="edit-level" class="form-control"></select>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
-                    <div class="form-group">
-                        <label class="form-label">Type du Concours</label>
-                        <select id="edit-type" class="form-control">
-                            <option value="Gratuit">Gratuit</option>
-                            <option value="Payant">Payant</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Lien de l'image (URL)</label>
-                        <input type="url" id="edit-image" class="form-control" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <label class="form-label" style="margin: 0;">Questions du concours (Coller les 10 questions ici)</label>
-                        <button type="button" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.7rem;" onclick="verifyQuestionsText()"><i class="fa-solid fa-magnifying-glass"></i> Vérifier le contenu</button>
-                    </div>
-                    <textarea id="edit-questions-raw" class="form-control" rows="11" style="font-family: monospace; font-size: 0.82rem;" placeholder="Question 1...
-A) Réponse A
-B) Réponse B
-C) Réponse C
-D) Réponse D
-Réponse : B..."></textarea>
-                </div>
-
-                <div id="parse-feedback" style="margin-bottom: 0.8rem; font-size: 0.8rem;"></div>
-
-                <button type="submit" class="btn btn-green btn-block">Enregistrer et Publier le Concours</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modale Demande d'Abonnement -->
-    <div class="modal" id="modal-buy-subscription">
-        <div class="modal-content" style="max-width: 420px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3><i class="fa-solid fa-gem" style="color: var(--civ-orange);"></i> Souscrire un Abonnement</h3>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-buy-subscription')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form onsubmit="handleSubscriptionRequest(event)">
-                <div class="form-group">
-                    <label class="form-label">Nom & Prénom</label>
-                    <input type="text" id="sub-req-name" class="form-control" required readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Numéro WhatsApp</label>
-                    <input type="tel" id="sub-req-phone" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Classe / Niveau</label>
-                    <select id="sub-req-class" class="form-control" required>
-                        <option value="CE2">CE2</option>
-                        <option value="CM1">CM1</option>
-                        <option value="CM2">CM2</option>
-                        <option value="6e">6e</option>
-                        <option value="5e">5e</option>
-                        <option value="4e">4e</option>
-                        <option value="3e">3e</option>
-                        <option value="Seconde">Seconde</option>
-                        <option value="Première">Première</option>
-                        <option value="Terminale">Terminale</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-green btn-block">Valider ma demande d'abonnement (500 FCFA)</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modale Admin : Participants -->
-    <div class="modal" id="modal-admin-users">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h4><i class="fa-solid fa-users" style="color: var(--civ-orange);"></i> Liste des Participants</h4>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-admin-users')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Nom & Prénom</th>
-                            <th>Établissement / Classe</th>
-                            <th>Ville</th>
-                            <th>WhatsApp</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-users-table"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Admin : Résultats Globaux -->
-    <div class="modal" id="modal-admin-results">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h4><i class="fa-solid fa-square-poll-vertical" style="color: var(--civ-orange);"></i> Résultats & Statistiques Globale</h4>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-admin-results')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Participant</th>
-                            <th>Concours</th>
-                            <th>Classe Concours</th>
-                            <th>Date</th>
-                            <th>Note /10</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-results-table"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Admin : Mots de passe -->
-    <div class="modal" id="modal-admin-resets">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h4><i class="fa-solid fa-key" style="color: var(--civ-orange);"></i> Demandes de Réinitialisation</h4>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-admin-resets')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <p style="font-size: 0.75rem; color: var(--text-sub); margin-bottom: 0.8rem;">Cliquer sur Réinitialiser pour définir le mot de passe par défaut à <strong>5555</strong>.</p>
-            <div id="admin-resets-list"></div>
-        </div>
-    </div>
-
-    <!-- Modale Admin : Abonnements -->
-    <div class="modal" id="modal-admin-subscription">
-        <div class="modal-content" style="max-width: 650px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h4><i class="fa-solid fa-crown" style="color: var(--civ-orange);"></i> Abonnements & Paiements</h4>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-admin-subscription')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Participant</th>
-                            <th>WhatsApp</th>
-                            <th>Classe</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-subscriptions-table"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Avis (Élève) -->
-    <div class="modal" id="modal-review">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <h4><i class="fa-solid fa-star" style="color: var(--civ-orange);"></i> Donnez votre avis</h4>
-                <button class="btn btn-secondary" style="padding: 2px 8px;" onclick="closeModal('modal-review')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form onsubmit="handleReviewSubmit(event)">
-                <div style="display: flex; gap: 8px; font-size: 1.4rem; color: var(--text-sub); cursor: pointer; margin-bottom: 1rem; justify-content: center;" id="star-rating-box">
-                    <i class="fa-solid fa-star active" style="color:var(--civ-orange);" onclick="setRating(1)"></i>
-                    <i class="fa-solid fa-star active" style="color:var(--civ-orange);" onclick="setRating(2)"></i>
-                    <i class="fa-solid fa-star active" style="color:var(--civ-orange);" onclick="setRating(3)"></i>
-                    <i class="fa-solid fa-star active" style="color:var(--civ-orange);" onclick="setRating(4)"></i>
-                    <i class="fa-solid fa-star active" style="color:var(--civ-orange);" onclick="setRating(5)"></i>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Votre commentaire</label>
-                    <textarea class="form-control" id="review-comment" rows="3" placeholder="Application excellente !" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-green btn-block">Publier mon avis</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- =================================================================== -->
-    <!-- LOGIQUE JAVASCRIPT                                                  -->
-    <!-- =================================================================== -->
-    <script>
-        // CONFIGURATION FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyCdJBT-uLhaNkzHn9SJWE9OM_EOGwlD4aI",
-            authDomain: "ztv-concours-36a45.firebaseapp.com",
-            databaseURL: "https://ztv-concours-36a45-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "ztv-concours-36a45",
-            storageBucket: "ztv-concours-36a45.firebasestorage.app",
-            messagingSenderId: "327142162801",
-            appId: "1:327142162801:web:2f312db2cc9f4cfd21f6d0",
-            measurementId: "G-ZPWGP4D9E0"
-        };
-
-        // Initialisation de Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const auth = firebase.auth();
-        const database = firebase.database();
-
-        const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80";
-
-        // Adaptateur Firebase Realtime Database
-        const DB = {
-            getContests: () => {
-                return new Promise((resolve) => {
-                    database.ref('contests').once('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (!data) {
-                            const defaultContests = [
-                                {
-                                    id: 1,
-                                    title: "Histoire - Le Temps et la Société",
-                                    category: "Collège",
-                                    level: "3e",
-                                    type: "Gratuit",
-                                    createdAt: "2026-07-30",
-                                    createdTime: "10:00",
-                                    online: true,
-                                    image: "https://images.unsplash.com/photo-1447069387593-a5de0862481e?w=500&q=80",
-                                    questions: Array(10).fill({
-                                        q: "Quelle est la capitale politique de la Côte d'Ivoire ?",
-                                        options: ["Abidjan", "Yamoussoukro", "Bouaké", "San-Pedro"],
-                                        answer: 1
-                                    })
-                                }
-                            ];
-                            database.ref('contests').set(defaultContests);
-                            resolve(defaultContests);
-                        } else {
-                            resolve(Array.isArray(data) ? data : Object.values(data));
-                        }
-                    });
-                });
-            },
-            saveContests: (data) => database.ref('contests').set(data),
-            
-            getUsers: () => {
-                return new Promise((resolve) => {
-                    database.ref('users').once('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (!data) {
-                            resolve([]);
-                        } else {
-                            resolve(Object.values(data));
-                        }
-                    });
-                });
-            },
-            
-            getResults: () => {
-                return new Promise((resolve) => {
-                    database.ref('results').once('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (!data) {
-                            resolve([]);
-                        } else {
-                            resolve(Object.values(data));
-                        }
-                    });
-                });
-            },
-            saveResults: (data) => database.ref('results').set(data),
-            
-            getReviews: () => {
-                return new Promise((resolve) => {
-                    database.ref('reviews').once('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (!data) {
-                            resolve([]);
-                        } else {
-                            resolve(Object.values(data));
-                        }
-                    });
-                });
-            },
-            saveReviews: (data) => database.ref('reviews').set(data),
-
-            getResets: () => {
-                return new Promise((resolve) => {
-                    database.ref('resets').once('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (!data) {
-                            resolve([]);
-                        } else {
-                            resolve(Object.values(data));
-                        }
-                    });
-                });
-            },
-            saveResets: (data) => database.ref('resets').set(data),
-
-            getSubscriptions: () => {
-                return new Promise((resolve) => {
-                    database.ref('subscriptions').once('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (!data) {
-                            resolve([]);
-                        } else {
-                            resolve(Object.values(data));
-                        }
-                    });
-                });
-            },
-            saveSubscriptions: (data) => database.ref('subscriptions').set(data)
-        };
-
-        let currentQuiz = null;
-        let currentQuestionIdx = 0;
-        let selectedOption = null;
-        let userAnswers = []; // Stockage des réponses pour la correction
-        let score = 0;
-        let timerInterval = null;
-        let currentRating = 5;
-        let currentUserPhone = null;
-        let currentUserData = null;
-
-        // Fonction utilitaire pour générer une adresse email Firebase à partir du numéro
-        function phoneToEmail(phone) {
-            const cleanPhone = phone.replace(/[^0-9]/g, '');
-            return `user_${cleanPhone}@ztv.ci`;
-        }
-
-        // Filtres
-        let selectedCategoryFilter = "Tous";
-        let selectedLevelFilter = "Tous";
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const uniqueUrl = window.location.origin + window.location.pathname + '?portal=participant';
-            document.getElementById('unique-share-link').value = uniqueUrl;
-
-            updateLevelOptions();
-
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            // Écoute de l'état d'authentification Firebase
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    database.ref('users/' + user.uid).once('value', (snapshot) => {
-                        currentUserData = snapshot.val();
-                        if (currentUserData) {
-                            currentUserPhone = currentUserData.phone;
-                            showView('participant-home-view');
-                        } else if (urlParams.get('portal') === 'participant') {
-                            showView('participant-auth-view');
-                        } else {
-                            showView('admin-login-view');
-                        }
-                    });
-                } else if (urlParams.get('portal') === 'participant') {
-                    showView('participant-auth-view');
-                } else {
-                    showView('admin-login-view');
-                }
-            });
-        });
-
-        // TOAST VERTE MODERNE HAUT DROITE
-        function showToastGreen(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast-green';
-            toast.innerHTML = `<i class="fa-solid fa-circle-check" style="font-size:1.1rem;"></i> <span>${message}</span>`;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 4000);
-        }
-
-        function showView(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            const target = document.getElementById(viewId);
-            if (target) target.classList.add('active');
-
-            // Gestion de l'affichage du bouton d'assistance WhatsApp (Élèves uniquement)
-            const waBtn = document.getElementById('whatsapp-btn');
-            if (viewId.startsWith('participant') && viewId !== 'participant-quiz-view') {
-                waBtn.style.display = 'flex';
-            } else {
-                waBtn.style.display = 'none';
-            }
-
-            if (viewId === 'admin-dashboard-view') renderAdminDashboard();
-            if (viewId === 'participant-home-view') renderParticipantHome();
-        }
-
-        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
-
-        // --- AUTHENTIFICATION & COMPTE PARTICIPANT ---
-        function switchAuthTab(tab) {
-            document.getElementById('participant-login-form').style.display = tab === 'login' ? 'block' : 'none';
-            document.getElementById('participant-register-form').style.display = tab === 'register' ? 'block' : 'none';
-            document.getElementById('tab-login-btn').className = tab === 'login' ? 'btn btn-orange btn-block' : 'btn btn-secondary btn-block';
-            document.getElementById('tab-register-btn').className = tab === 'register' ? 'btn btn-orange btn-block' : 'btn btn-secondary btn-block';
-        }
-
-        async function handleParticipantRegister(e) {
-            e.preventDefault();
-            const lastname = document.getElementById('part-reg-lastname').value.trim();
-            const firstname = document.getElementById('part-reg-firstname').value.trim();
-            const city = document.getElementById('part-reg-city').value.trim();
-            const country = document.getElementById('part-reg-country').value.trim();
-            const school = document.getElementById('part-reg-school').value.trim();
-            const userClass = document.getElementById('part-reg-class').value;
-            const phone = document.getElementById('part-reg-phone').value.trim();
-            const avatar = document.getElementById('part-reg-avatar').value || DEFAULT_AVATAR;
-            const pass = document.getElementById('part-reg-pass').value;
-
-            const email = phoneToEmail(phone);
-
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
-                const user = userCredential.user;
-
-                const newUser = {
-                    uid: user.uid,
-                    lastname,
-                    firstname,
-                    name: `${firstname} ${lastname}`,
-                    school,
-                    class: userClass,
-                    city,
-                    country,
-                    phone,
-                    avatar,
-                    createdAt: new Date().toISOString(),
-                    subscription: { active: false, expiresAt: null }
-                };
-
-                await database.ref('users/' + user.uid).set(newUser);
-
-                currentUserData = newUser;
-                currentUserPhone = phone;
-
-                showToastGreen("✅ Compte créé avec succès.");
-                showView('participant-home-view');
-            } catch (error) {
-                if (error.code === 'auth/email-already-in-use') {
-                    alert("Un compte existe déjà avec ce numéro WhatsApp.");
-                } else if (error.code === 'auth/weak-password') {
-                    alert("Le mot de passe doit contenir au moins 6 caractères.");
-                } else {
-                    alert("Erreur d'inscription : " + error.message);
-                }
-            }
-        }
-
-        async function handleParticipantLogin(e) {
-            e.preventDefault();
-            const phone = document.getElementById('part-login-phone').value.trim();
-            const pass = document.getElementById('part-login-pass').value;
-
-            const email = phoneToEmail(phone);
-
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, pass);
-                const user = userCredential.user;
-
-                const snapshot = await database.ref('users/' + user.uid).once('value');
-                currentUserData = snapshot.val();
-                currentUserPhone = phone;
-
-                showToastGreen("✅ Connexion réussie.");
-                showView('participant-home-view');
-            } catch (error) {
-                alert("Numéro WhatsApp ou mot de passe incorrect.");
-            }
-        }
-
-        async function logoutUser() {
-            closeModal('modal-profile');
-            await auth.signOut();
-            currentUserPhone = null;
-            currentUserData = null;
-            showToastGreen("Déconnexion effectuée.");
-            showView('participant-auth-view');
-        }
-
-        // --- MOT DE PASSE OUBLIÉ ---
-        let foundUserForReset = null;
-
-        async function openForgotPasswordModal() {
-            document.getElementById('forgot-step-1').style.display = 'block';
-            document.getElementById('forgot-step-2').style.display = 'none';
-            document.getElementById('forgot-phone-input').value = '';
-            document.getElementById('modal-forgot-password').classList.add('active');
-        }
-
-        async function verifyForgotPhone() {
-            const phone = document.getElementById('forgot-phone-input').value.trim();
-            const users = await DB.getUsers();
-            foundUserForReset = users.find(u => u.phone === phone);
-
-            if (foundUserForReset) {
-                document.getElementById('forgot-found-lastname').innerText = foundUserForReset.lastname || '';
-                document.getElementById('forgot-found-firstname').innerText = foundUserForReset.firstname || foundUserForReset.name;
-                document.getElementById('forgot-found-school').innerText = foundUserForReset.school || 'N/A';
-                document.getElementById('forgot-found-city').innerText = foundUserForReset.city || 'N/A';
-                
-                document.getElementById('forgot-step-1').style.display = 'none';
-                document.getElementById('forgot-step-2').style.display = 'block';
-            } else {
-                alert("Aucun compte trouvé avec ce numéro WhatsApp.");
-            }
-        }
-
-        async function confirmResetRequest() {
-            if (foundUserForReset) {
-                const resets = await DB.getResets();
-                resets.push({
-                    phone: foundUserForReset.phone,
-                    name: `${foundUserForReset.firstname || ''} ${foundUserForReset.lastname || ''}`,
-                    date: new Date().toLocaleDateString('fr-FR')
-                });
-                await DB.saveResets(resets);
-                closeModal('modal-forgot-password');
-                showToastGreen("✅ Demande de réinitialisation envoyée.");
-            }
-        }
-
-        // --- MODIFICATION MOT DE PASSE ---
-        async function handleChangePassword(e) {
-            e.preventDefault();
-            const curr = document.getElementById('pass-curr').value;
-            const newP = document.getElementById('pass-new').value;
-            const conf = document.getElementById('pass-conf').value;
-
-            if (newP !== conf) {
-                alert("Les mots de passe ne correspondent pas.");
-                return;
-            }
-
-            const user = auth.currentUser;
-            if (user) {
-                const email = user.email;
-                const credential = firebase.auth.EmailAuthProvider.credential(email, curr);
-                
-                try {
-                    await user.reauthenticateWithCredential(credential);
-                    await user.updatePassword(newP);
-                    closeModal('modal-profile');
-                    showToastGreen("✅ Informations mises à jour.");
-                } catch (error) {
-                    alert("Mot de passe actuel incorrect ou erreur de mise à jour.");
-                }
-            }
-        }
-
-        // --- ACCUEIL CONCOURS ---
-        function setCategoryFilter(cat) {
-            selectedCategoryFilter = cat;
-            selectedLevelFilter = "Tous";
-
-            document.getElementById('filter-cat-all').className = cat === 'Tous' ? 'btn btn-secondary active' : 'btn btn-secondary';
-            document.getElementById('filter-cat-primaire').className = cat === 'Primaire' ? 'btn btn-secondary active' : 'btn btn-secondary';
-            document.getElementById('filter-cat-college').className = cat === 'Collège' ? 'btn btn-secondary active' : 'btn btn-secondary';
-
-            const subBar = document.getElementById('subcategories-filter-bar');
-            subBar.innerHTML = '';
-
-            if (cat === 'Primaire') {
-                subBar.style.display = 'flex';
-                ['Tous', 'CE2', 'CM1', 'CM2'].forEach(lvl => {
-                    subBar.innerHTML += `<button class="btn btn-secondary ${selectedLevelFilter === lvl ? 'active' : ''}" onclick="setLevelFilter('${lvl}')">${lvl}</button>`;
-                });
-            } else if (cat === 'Collège') {
-                subBar.style.display = 'flex';
-                ['Tous', '6e', '5e', '4e', '3e', 'Seconde', 'Première', 'Terminale'].forEach(lvl => {
-                    subBar.innerHTML += `<button class="btn btn-secondary ${selectedLevelFilter === lvl ? 'active' : ''}" onclick="setLevelFilter('${lvl}')">${lvl}</button>`;
-                });
-            } else {
-                subBar.style.display = 'none';
-            }
-
-            renderParticipantHome();
-        }
-
-        function setLevelFilter(lvl) {
-            selectedLevelFilter = lvl;
-            const subBar = document.getElementById('subcategories-filter-bar');
-            subBar.querySelectorAll('button').forEach(btn => {
-                btn.className = btn.innerText === lvl ? 'btn btn-secondary active' : 'btn btn-secondary';
-            });
-            renderParticipantHome();
-        }
-
-        async function renderParticipantHome() {
-            const u = currentUserData || { name: "Élève", school: "Établissement", class: "Classe", avatar: DEFAULT_AVATAR };
-            
-            document.getElementById('user-display-name').innerText = u.name;
-            document.getElementById('user-display-details').innerText = `${u.school || 'Établissement non renseigné'} • Classe : ${u.class || 'N/A'}`;
-            document.getElementById('home-user-avatar').src = u.avatar || DEFAULT_AVATAR;
-
-            // Statut Abonnement
-            const isSubActive = checkUserSubscription(u);
-            const statusBadge = document.getElementById('user-sub-status-badge');
-            statusBadge.innerText = isSubActive ? "STATUT : PREMIUM ACTIF" : "STATUT : GRATUIT";
-            statusBadge.style.background = isSubActive ? "var(--civ-orange)" : "var(--card-alt)";
-            statusBadge.style.color = isSubActive ? "#000" : "#FFF";
-
-            const list = document.getElementById('participant-contest-list');
-            list.innerHTML = '';
-            
-            let allContests = await DB.getContests();
-            let contests = allContests.filter(c => c.online);
-
-            if (selectedCategoryFilter !== 'Tous') contests = contests.filter(c => c.category === selectedCategoryFilter);
-            if (selectedLevelFilter !== 'Tous') contests = contests.filter(c => c.level === selectedLevelFilter);
-
-            if (contests.length === 0) {
-                list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 2rem; background: var(--card-bg); border-radius:10px; border:1px solid var(--border);">
-                    <p style="color:var(--text-sub); font-size:0.9rem;">Aucun concours n'est disponible pour le moment dans ce niveau.</p>
-                </div>`;
-                return;
-            }
-
-            contests.forEach(c => {
-                const isPaid = c.type === 'Payant';
-                list.innerHTML += `
-                    <div class="contest-card">
-                        <img src="${c.image}" alt="${c.title}" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin-bottom:8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span class="badge badge-class"><i class="fa-solid fa-graduation-cap"></i> Classe : ${c.level || 'Toutes'}</span>
-                            <span class="badge ${isPaid ? 'badge-paid' : 'badge-free'}">${c.type}</span>
-                        </div>
-                        <div class="contest-title">${c.title}</div>
-                        <div style="font-size:0.72rem; color:var(--text-sub); margin-bottom:8px;">
-                            <i class="fa-regular fa-calendar"></i> Publié le : ${c.createdAt || 'Récent'}
-                        </div>
-                        <button class="btn btn-green btn-block" onclick="startWaitingCountdown(${c.id})">
-                            Participer <i class="fa-solid fa-play"></i>
-                        </button>
-                    </div>
-                `;
-            });
-        }
-
-        function checkUserSubscription(user) {
-            if (!user || !user.subscription || !user.subscription.active) return false;
-            if (new Date(user.subscription.expiresAt) < new Date()) {
-                user.subscription.active = false;
-                if (user.uid) {
-                    database.ref('users/' + user.uid + '/subscription/active').set(false);
-                }
-                return false;
-            }
-            return true;
-        }
-
-        // --- CREATION DE CONCOURS ---
-        function updateLevelOptions() {
-            const cat = document.getElementById('edit-category').value;
-            const lvlSelect = document.getElementById('edit-level');
-            lvlSelect.innerHTML = '';
-
-            if (cat === 'Primaire') {
-                ['CE2', 'CM1', 'CM2'].forEach(l => lvlSelect.innerHTML += `<option value="${l}">${l}</option>`);
-            } else {
-                ['6e', '5e', '4e', '3e', 'Seconde', 'Première', 'Terminale'].forEach(l => lvlSelect.innerHTML += `<option value="${l}">${l}</option>`);
-            }
-        }
-
-        function verifyQuestionsText() {
-            const rawText = document.getElementById('edit-questions-raw').value.trim();
-            const feedback = document.getElementById('parse-feedback');
-            const parseResult = parseRawQuestions(rawText);
-
-            if (parseResult.success) {
-                feedback.innerHTML = `<span style="color:var(--civ-green); font-weight:700;">✅ Les ${parseResult.questions.length} questions sont valides.</span>`;
-            } else {
-                feedback.innerHTML = `<span style="color:var(--danger); font-weight:700;">Erreur : ${parseResult.error}</span>`;
-            }
-        }
-
-        function parseRawQuestions(text) {
-            if (!text) return { success: false, error: "Champ vide." };
-
-            const blocks = text.split(/\n\s*\n/).filter(b => b.trim().length > 0);
-            if (blocks.length !== 10) {
-                return { success: false, error: `Exactement 10 questions requises (${blocks.length} détectées).` };
-            }
-
-            const questions = [];
-
-            for (let i = 0; i < blocks.length; i++) {
-                const lines = blocks[i].split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                if (lines.length < 6) return { success: false, error: `Question ${i + 1} incomplète.` };
-
-                const qText = lines[0];
-                let optA = "", optB = "", optC = "", optD = "", answer = -1;
-
-                lines.forEach(line => {
-                    if (line.startsWith("A)")) optA = line.replace("A)", "").trim();
-                    if (line.startsWith("B)")) optB = line.replace("B)", "").trim();
-                    if (line.startsWith("C)")) optC = line.replace("C)", "").trim();
-                    if (line.startsWith("D)")) optD = line.replace("D)", "").trim();
-                    if (line.toLowerCase().includes("réponse") || line.toLowerCase().includes("reponse")) {
-                        const ansChar = line.split(":")[1]?.trim().toUpperCase();
-                        if (ansChar === "A") answer = 0;
-                        if (ansChar === "B") answer = 1;
-                        if (ansChar === "C") answer = 2;
-                        if (ansChar === "D") answer = 3;
-                    }
-                });
-
-                if (!optA || !optB || !optC || !optD || answer === -1) {
-                    return { success: false, error: `Erreur dans la Question ${i + 1}.` };
-                }
-
-                questions.push({ q: qText, options: [optA, optB, optC, optD], answer });
-            }
-
-            return { success: true, questions };
-        }
-
-        async function handleSaveContest(e) {
-            e.preventDefault();
-            const rawText = document.getElementById('edit-questions-raw').value.trim();
-            const parseResult = parseRawQuestions(rawText);
-
-            if (!parseResult.success) {
-                alert("Erreur de validation :\n" + parseResult.error);
-                return;
-            }
-
-            const id = document.getElementById('edit-contest-id').value;
-            const contests = await DB.getContests();
-            const now = new Date();
-
-            const contestData = {
-                id: id ? parseInt(id) : Date.now(),
-                title: document.getElementById('edit-title').value,
-                category: document.getElementById('edit-category').value,
-                level: document.getElementById('edit-level').value,
-                type: document.getElementById('edit-type').value,
-                createdAt: now.toISOString().split('T')[0],
-                online: true,
-                image: document.getElementById('edit-image').value,
-                questions: parseResult.questions
-            };
-
-            if (id) {
-                const idx = contests.findIndex(c => c.id == id);
-                if (idx !== -1) contests[idx] = contestData;
-            } else {
-                contests.push(contestData);
-            }
-
-            await DB.saveContests(contests);
-            closeModal('modal-edit-contest');
-            renderAdminDashboard();
-            showToastGreen("✅ Concours enregistré.");
-        }
-
-        // --- DEROULEMENT QUIZ (CHRONOMÈTRE 30S & AUDIO CONTINU) ---
-        async function startWaitingCountdown(id) {
-            const contests = await DB.getContests();
-            currentQuiz = contests.find(c => c.id === id);
-            
-            if (currentQuiz.type === 'Payant') {
-                const u = currentUserData;
-                if (!checkUserSubscription(u)) {
-                    alert("Ce concours est réservé aux abonnés Premium.");
-                    openBuySubscriptionModal();
-                    return;
-                }
-            }
-
-            showView('participant-waiting-view');
-
-            let timeLeft = 20;
-            const timerEl = document.getElementById('wait-countdown');
-            timerEl.innerText = timeLeft;
-
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerEl.innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    launchQuiz();
-                }
-            }, 1000);
-        }
-
-        function cancelWaiting() {
-            clearInterval(timerInterval);
-            showView('participant-home-view');
-        }
-
-        function launchQuiz() {
-            currentQuestionIdx = 0;
-            score = 0;
-            userAnswers = [];
-            showView('participant-quiz-view');
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            clearInterval(timerInterval);
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-            selectedOption = null;
-
-            const totalQ = currentQuiz.questions.length;
-            const qData = currentQuiz.questions[currentQuestionIdx];
-
-            document.getElementById('quiz-progress').innerText = `Question ${currentQuestionIdx + 1} / ${totalQ} • Classe : ${currentQuiz.level}`;
-            document.getElementById('quiz-question-text').innerText = qData.q;
-
-            const optionsBox = document.getElementById('quiz-options-container');
-            optionsBox.innerHTML = '';
-            const labels = ['A', 'B', 'C', 'D'];
-
-            qData.options.forEach((opt, idx) => {
-                optionsBox.innerHTML += `
-                    <div class="option-box" id="opt-${idx}" onclick="selectOption(${idx})">
-                        <span><strong>${labels[idx]})</strong> ${opt}</span>
-                        <i class="fa-regular fa-circle"></i>
-                    </div>
-                `;
-            });
-
-            // Lancement automatique de la synthèse vocale
-            setTimeout(() => { playAudioQuestion(); }, 300);
-
-            // Chronomètre Rouge de 30 Secondes
-            let timeLeft = 30;
-            const timerEl = document.getElementById('question-timer');
-            timerEl.innerText = timeLeft;
-
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerEl.innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    submitAnswer();
-                }
-            }, 1000);
-        }
-
-        function selectOption(idx) {
-            selectedOption = idx;
-            document.querySelectorAll('.option-box').forEach((btn, i) => {
-                btn.className = i === idx ? 'option-box selected' : 'option-box';
-                btn.querySelector('i').className = i === idx ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle';
-            });
-        }
-
-        async function submitAnswer() {
-            clearInterval(timerInterval);
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-
-            const qData = currentQuiz.questions[currentQuestionIdx];
-            
-            // Stockage de la réponse choisie par l'élève (-1 si aucune option sélectionnée)
-            const chosen = (selectedOption !== null) ? selectedOption : -1;
-            userAnswers.push(chosen);
-
-            if (chosen === qData.answer) score++;
-
-            currentQuestionIdx++;
-            if (currentQuestionIdx < currentQuiz.questions.length) {
-                loadQuestion();
-            } else {
-                const results = await DB.getResults();
-                const u = currentUserData || { name: "Anonyme", school: "N/A", class: "N/A", city: "N/A" };
-
-                // Enregistrement des résultats complets avec Classe et Date
-                results.unshift({
-                    userName: u.name,
-                    userFirstname: u.firstname || u.name,
-                    userLastname: u.lastname || '',
-                    userPhone: currentUserPhone,
-                    userSchool: u.school || 'Non renseigné',
-                    userClass: u.class || 'N/A',
-                    userCity: u.city || 'Non renseignée',
-                    contestTitle: currentQuiz.title,
-                    contestClass: currentQuiz.level || 'CE2',
-                    score: score,
-                    maxScore: 10,
-                    date: new Date().toLocaleDateString('fr-FR')
-                });
-                await DB.saveResults(results);
-
-                document.getElementById('finish-score-display').innerText = `${score} / 10`;
-                document.getElementById('finish-class-display').innerText = `Concours Niveau : ${currentQuiz.level} • Date : ${new Date().toLocaleDateString('fr-FR')}`;
-                showView('participant-finish-view');
-            }
-        }
-
-        // LECTURE VOCALE ROBUSTE ET COMPATIBLE TOUS APPAREILS (Question -> Option A -> B -> C -> D)
-        function playAudioQuestion() {
-            if (!('speechSynthesis' in window) || !currentQuiz || !currentQuiz.questions[currentQuestionIdx]) return;
-            
-            // Annuler toute lecture en cours pour éviter les chevauchements
-            window.speechSynthesis.cancel();
-
-            const qData = currentQuiz.questions[currentQuestionIdx];
-            const labels = ['Option A', 'Option B', 'Option C', 'Option D'];
-            
-            let textToRead = qData.q + ". ";
-            qData.options.forEach((opt, idx) => {
-                textToRead += `${labels[idx]} : ${opt}. `;
-            });
-
-            // Découpage du texte en segments courts (phrases/propositions) pour contourner les limitations des navigateurs mobiles (iOS Safari, Android Chrome)
-            const parts = textToRead.match(/[^.!?]+[.!?]+/g) || [textToRead];
-            
-            function speakParts(index) {
-                if (index >= parts.length) return;
-
-                const utterance = new SpeechSynthesisUtterance(parts[index].trim());
-                utterance.lang = 'fr-FR';
-                utterance.rate = 0.95;
-
-                // Tenter de sélectionner une voix française native disponible sur le système
-                const voices = window.speechSynthesis.getVoices();
-                const frVoice = voices.find(v => v.lang.startsWith('fr') || v.lang.includes('FR'));
-                if (frVoice) {
-                    utterance.voice = frVoice;
-                }
-
-                utterance.onend = () => {
-                    speakParts(index + 1);
-                };
-
-                utterance.onerror = (e) => {
-                    console.warn("Erreur de synthèse vocale:", e);
-                    speakParts(index + 1);
-                };
-
-                window.speechSynthesis.speak(utterance);
-            }
-
-            // S'assurer que les voix sont chargées si nécessaire (Webkit workaround)
-            if (window.speechSynthesis.getVoices().length === 0) {
-                window.speechSynthesis.onvoiceschanged = () => {
-                    speakParts(0);
-                };
-            }
-            speakParts(0);
-        }
-
-        // --- AFFICHAGE DE LA CORRECTION DU CONCOURS ---
-        function openCorrectionModal() {
-            if (!currentQuiz || !currentQuiz.questions) return;
-
-            const container = document.getElementById('correction-list-container');
-            container.innerHTML = '';
-            const labels = ['A', 'B', 'C', 'D'];
-
-            currentQuiz.questions.forEach((qData, idx) => {
-                const userChoiceIdx = userAnswers[idx];
-                const isCorrect = (userChoiceIdx === qData.answer);
-                
-                const userChoiceText = (userChoiceIdx !== -1 && userChoiceIdx !== undefined) 
-                    ? `${labels[userChoiceIdx]}) ${qData.options[userChoiceIdx]}` 
-                    : "Aucune réponse (Temps écoulé)";
-                
-                const correctChoiceText = `${labels[qData.answer]}) ${qData.options[qData.answer]}`;
-
-                container.innerHTML += `
-                    <div style="background: var(--card-alt); border: 1px solid ${isCorrect ? 'var(--civ-green)' : 'var(--danger)'}; border-radius: var(--radius-md); padding: 1rem; text-align: left;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <strong style="color: var(--civ-orange);">Question ${idx + 1} / ${currentQuiz.questions.length}</strong>
-                            <span class="badge ${isCorrect ? 'badge-online' : 'badge-offline'}">
-                                ${isCorrect ? '✅ Correct' : '❌ Incorrect'}
-                            </span>
-                        </div>
-                        <p style="font-size: 0.95rem; font-weight: 700; color: #FFF; margin-bottom: 0.8rem;">${qData.q}</p>
-                        
-                        <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 0.3rem;">
-                            <strong>Votre réponse :</strong> <span style="color: ${isCorrect ? '#00FF66' : 'var(--danger)'}; font-weight: 700;">${userChoiceText}</span>
-                        </p>
-                        <p style="font-size: 0.85rem; color: var(--text-sub);">
-                            <strong>Bonne réponse :</strong> <span style="color: var(--civ-green); font-weight: 700;">${correctChoiceText}</span>
-                        </p>
-                    </div>
-                `;
-            });
-
-            document.getElementById('modal-correction').classList.add('active');
-        }
-
-        function confirmExitQuiz() {
-            if (confirm("Voulez-vous vraiment quitter le concours ?")) {
-                clearInterval(timerInterval);
-                if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-                showView('participant-home-view');
-            }
-        }
-
-        // --- CALCUL CENTRALISÉ DES CLASSEMENTS ---
-        async function computeUserAggregatedStats() {
-            const results = await DB.getResults();
-            const users = await DB.getUsers();
-            const statsMap = {};
-
-            // Initialiser les données pour tous les utilisateurs enregistrés
-            users.forEach(u => {
-                const key = u.phone;
-                statsMap[key] = {
-                    phone: u.phone,
-                    lastname: u.lastname || '',
-                    firstname: u.firstname || u.name,
-                    school: u.school || 'Non renseigné',
-                    city: u.city || 'Non renseignée',
-                    class: u.class || 'CE2',
-                    totalContests: 0,
-                    totalPoints: 0
-                };
-            });
-
-            // Cumuler les résultats des concours joués
-            results.forEach(r => {
-                const key = r.userPhone;
-                if (!statsMap[key]) {
-                    statsMap[key] = {
-                        phone: key || 'Inconnu',
-                        lastname: r.userLastname || '',
-                        firstname: r.userFirstname || r.userName,
-                        school: r.userSchool || 'Non renseigné',
-                        city: r.userCity || 'Non renseignée',
-                        class: r.userClass || 'CE2',
-                        totalContests: 0,
-                        totalPoints: 0
-                    };
-                }
-                statsMap[key].totalContests += 1;
-                statsMap[key].totalPoints += r.score;
-            });
-
-            return Object.values(statsMap);
-        }
-
-        // --- TOP 10 DES MEILLEURS ÉLÈVES (PARTICIPANT) ---
-        async function openTop10Modal() {
-            const stats = await computeUserAggregatedStats();
-            const sorted = stats.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 10);
-
-            const tbody = document.getElementById('top10-table-body');
-            tbody.innerHTML = '';
-
-            if (sorted.length === 0 || sorted.every(s => s.totalPoints === 0)) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Aucun résultat enregistré.</td></tr>`;
-            } else {
-                sorted.forEach((item, idx) => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
-                            <td><strong>${item.lastname}</strong></td>
-                            <td>${item.firstname}</td>
-                            <td>${item.school}</td>
-                            <td><span class="badge badge-class">${item.class}</span></td>
-                            <td>${item.city}</td>
-                            <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
-                        </tr>
-                    `;
-                });
-            }
-
-            document.getElementById('modal-top10').classList.add('active');
-        }
-
-        // --- CLASSEMENT GÉNÉRAL (PARTICIPANT) ---
-        let currentParticipantRankMode = 'level';
-
-        function openGeneralRankingModal() {
-            switchRankingTab('level');
-            document.getElementById('modal-general-ranking').classList.add('active');
-        }
-
-        function switchRankingTab(mode) {
-            currentParticipantRankMode = mode;
-            document.getElementById('btn-rank-mode-level').className = mode === 'level' ? 'btn btn-secondary active' : 'btn btn-secondary';
-            document.getElementById('btn-rank-mode-global').className = mode === 'global' ? 'btn btn-secondary active' : 'btn btn-secondary';
-            
-            document.getElementById('ranking-level-select-box').style.display = mode === 'level' ? 'block' : 'none';
-
-            if (mode === 'level') {
-                renderParticipantLevelRanking();
-            } else {
-                renderParticipantGlobalRanking();
-            }
-        }
-
-        async function renderParticipantLevelRanking() {
-            const selectedClass = document.getElementById('ranking-class-select').value;
-            const stats = await computeUserAggregatedStats();
-            const filtered = stats.filter(s => s.class === selectedClass).sort((a, b) => b.totalPoints - a.totalPoints);
-
-            const tbody = document.getElementById('general-ranking-table-body');
-            tbody.innerHTML = '';
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Aucun élève dans cette classe.</td></tr>`;
-                return;
-            }
-
-            filtered.forEach((item, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
-                        <td><strong>${item.lastname}</strong></td>
-                        <td>${item.firstname}</td>
-                        <td>${item.school}</td>
-                        <td>${item.city}</td>
-                        <td><span class="badge badge-class">${item.class}</span></td>
-                        <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
-                    </tr>
-                `;
-            });
-        }
-
-        async function renderParticipantGlobalRanking() {
-            const stats = await computeUserAggregatedStats();
-            const sorted = stats.sort((a, b) => b.totalPoints - a.totalPoints);
-
-            const tbody = document.getElementById('general-ranking-table-body');
-            tbody.innerHTML = '';
-
-            if (sorted.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Aucun inscrit.</td></tr>`;
-                return;
-            }
-
-            sorted.forEach((item, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
-                        <td><strong>${item.lastname}</strong></td>
-                        <td>${item.firstname}</td>
-                        <td>${item.school}</td>
-                        <td>${item.city}</td>
-                        <td><span class="badge badge-class">${item.class}</span></td>
-                        <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
-                    </tr>
-                `;
-            });
-        }
-
-        // --- MES CONCOURS & SCORE ---
-        async function openMyContestsModal() {
-            const results = await DB.getResults();
-            const myResults = results.filter(r => r.userPhone === currentUserPhone);
-
-            const totalPts = myResults.reduce((acc, curr) => acc + curr.score, 0);
-            document.getElementById('my-total-points').innerText = totalPts;
-            document.getElementById('my-total-count').innerText = myResults.length;
-
-            const tbody = document.getElementById('my-contests-table-body');
-            tbody.innerHTML = '';
-
-            if (myResults.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Vous n'avez pas encore effectué de concours.</td></tr>`;
-            } else {
-                myResults.forEach(r => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><strong>${r.contestTitle}</strong></td>
-                            <td><span class="badge badge-class">${r.contestClass || 'N/A'}</span></td>
-                            <td>${r.date || 'Récemment'}</td>
-                            <td><strong style="color:var(--civ-orange);">${r.score} / 10</strong></td>
-                            <td><span class="badge badge-online">Complété</span></td>
-                        </tr>
-                    `;
-                });
-            }
-
-            document.getElementById('modal-my-contests').classList.add('active');
-        }
-
-        // --- PROFIL ÉLÈVE ---
-        function openProfileModal() {
-            const u = currentUserData || { name: "Élève", school: "N/A", class: "N/A", city: "N/A", phone: "N/A", avatar: DEFAULT_AVATAR };
-            
-            document.getElementById('prof-modal-avatar').src = u.avatar || DEFAULT_AVATAR;
-            document.getElementById('prof-name').innerText = u.name;
-            document.getElementById('prof-lastname').innerText = u.lastname || '';
-            document.getElementById('prof-firstname').innerText = u.firstname || u.name;
-            document.getElementById('prof-school').innerText = u.school || 'Non renseigné';
-            document.getElementById('prof-class').innerText = u.class || 'N/A';
-            document.getElementById('prof-location').innerText = `${u.city || 'N/A'}, ${u.country || "Côte d'Ivoire"}`;
-            document.getElementById('prof-phone').innerText = u.phone || 'N/A';
-
-            const isSub = checkUserSubscription(u);
-            const badge = document.getElementById('prof-sub-badge');
-            badge.innerText = isSub ? "Statut : Premium Actif" : "Statut : Gratuit";
-            badge.style.color = isSub ? "var(--civ-orange)" : "var(--civ-green)";
-
-            document.getElementById('modal-profile').classList.add('active');
-        }
-
-        // --- ACHAT ABONNEMENT ---
-        function openBuySubscriptionModal() {
-            const u = currentUserData || { name: "", phone: "", class: "3e" };
-            document.getElementById('sub-req-name').value = u.name || '';
-            document.getElementById('sub-req-phone').value = u.phone || '';
-            document.getElementById('sub-req-class').value = u.class || '3e';
-
-            document.getElementById('modal-buy-subscription').classList.add('active');
-        }
-
-        async function handleSubscriptionRequest(e) {
-            e.preventDefault();
-            const phone = document.getElementById('sub-req-phone').value.trim();
-            const userClass = document.getElementById('sub-req-class').value;
-
-            const subs = await DB.getSubscriptions();
-            subs.unshift({
-                phone,
-                name: currentUserData?.name || 'Inconnu',
-                class: userClass,
-                status: 'En attente',
-                date: new Date().toLocaleDateString('fr-FR')
-            });
-
-            await DB.saveSubscriptions(subs);
-            closeModal('modal-buy-subscription');
-            showToastGreen("✅ Demande transmise à l'administrateur.");
-        }
-
-        // --- AVIS ÉLÈVE ---
-        function openReviewModal() {
-            document.getElementById('modal-review').classList.add('active');
-        }
-
-        function setRating(r) {
-            currentRating = r;
-            const stars = document.getElementById('star-rating-box').children;
-            for (let i = 0; i < 5; i++) {
-                stars[i].style.color = i < r ? 'var(--civ-orange)' : 'var(--text-sub)';
-            }
-        }
-
-        async function handleReviewSubmit(e) {
-            e.preventDefault();
-            const comment = document.getElementById('review-comment').value.trim();
-            const u = currentUserData || { name: "Élève anonyme" };
-
-            const reviews = await DB.getReviews();
-            reviews.unshift({
-                name: u.name,
-                rating: currentRating,
-                comment,
-                date: new Date().toLocaleDateString('fr-FR')
-            });
-
-            await DB.saveReviews(reviews);
-            closeModal('modal-review');
-            showToastGreen("✅ Avis publié avec succès !");
-        }
-
-        function openCreatorModal() {
-            document.getElementById('modal-creator').classList.add('active');
-        }
-
-        function copyUniqueLink() {
-            const input = document.getElementById('unique-share-link');
-            input.select();
-            document.execCommand('copy');
-            showToastGreen("📋 Lien unique copié.");
-        }
-
-        // --- ADMINISTRATION ---
-        function handleAdminLogin(e) {
-            e.preventDefault();
-            const u = document.getElementById('admin-user').value.trim();
-            const p = document.getElementById('admin-pass').value.trim();
-
-            if (u === 'ZakariaTV' && p === '55250031') {
-                showToastGreen("Connexion Administrateur réussie.");
-                showView('admin-dashboard-view');
-            } else {
-                alert("Identifiants incorrects.");
-            }
-        }
-
-        async function renderAdminDashboard() {
-            const contests = await DB.getContests();
-            const users = await DB.getUsers();
-            const results = await DB.getResults();
-            const resets = await DB.getResets();
-            const subs = await DB.getSubscriptions();
-            const reviews = await DB.getReviews();
-
-            document.getElementById('stat-contests').innerText = contests.length;
-            document.getElementById('stat-users').innerText = users.length;
-            document.getElementById('stat-participations').innerText = results.length;
-            document.getElementById('stat-resets').innerText = resets.length;
-
-            document.getElementById('users-count-badge').innerText = users.length;
-            document.getElementById('reset-badge-count').innerText = resets.length;
-            document.getElementById('sub-badge-count').innerText = subs.filter(s => s.status === 'En attente').length;
-
-            // Rendu des Concours Admin
-            const list = document.getElementById('admin-contest-list');
-            list.innerHTML = '';
-            contests.forEach(c => {
-                list.innerHTML += `
-                    <div class="contest-card">
-                        <img src="${c.image}" alt="${c.title}" style="width:100%; height:100px; object-fit:cover; border-radius:10px; margin-bottom:6px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <span class="badge badge-class">${c.level}</span>
-                            <span class="badge ${c.online ? 'badge-online' : 'badge-offline'}">${c.online ? 'En ligne' : 'Hors ligne'}</span>
-                        </div>
-                        <strong style="font-size:0.85rem;">${c.title}</strong>
-                        <div style="display:flex; gap:6px; margin-top:8px;">
-                            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.7rem; flex:1;" onclick="toggleContestOnline(${c.id})">
-                                ${c.online ? 'Masquer' : 'Publier'}
-                            </button>
-                            <button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteContest(${c.id})">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // Rendu des Avis Admin
-            const revList = document.getElementById('admin-reviews-list');
-            revList.innerHTML = '';
-            if (reviews.length === 0) {
-                revList.innerHTML = `<p style="color:var(--text-sub); font-size:0.8rem;">Aucun avis pour le moment.</p>`;
-            } else {
-                reviews.forEach(r => {
-                    revList.innerHTML += `
-                        <div style="background:var(--card-alt); border-bottom:1px solid var(--border); padding:8px; margin-bottom:4px; border-radius:6px; font-size:0.8rem;">
-                            <div style="display:flex; justify-content:space-between;">
-                                <strong>${r.name}</strong>
-                                <span style="color:var(--civ-orange);">${'★'.repeat(r.rating)}</span>
-                            </div>
-                            <p style="color:var(--text-sub); margin-top:2px;">${r.comment}</p>
-                            <div style="font-size:0.68rem; color:var(--text-sub); text-align:right;">${r.date || 'Récemment'}</div>
-                        </div>
-                    `;
-                });
-            }
-        }
-
-        function openCreateContestModal() {
-            document.getElementById('edit-contest-id').value = '';
-            document.getElementById('edit-title').value = '';
-            document.getElementById('edit-image').value = 'https://images.unsplash.com/photo-1447069387593-a5de0862481e?w=500&q=80';
-            document.getElementById('edit-questions-raw').value = '';
-            document.getElementById('parse-feedback').innerHTML = '';
-            document.getElementById('modal-contest-title').innerText = "Créer un Concours (Analyse Automatique)";
-            document.getElementById('modal-edit-contest').classList.add('active');
-        }
-
-        async function toggleContestOnline(id) {
-            const contests = await DB.getContests();
-            const c = contests.find(item => item.id == id);
-            if (c) {
-                c.online = !c.online;
-                await DB.saveContests(contests);
-                renderAdminDashboard();
-            }
-        }
-
-        async function deleteContest(id) {
-            if (confirm("Voulez-vous supprimer ce concours ?")) {
-                let contests = await DB.getContests();
-                contests = contests.filter(item => item.id != id);
-                await DB.saveContests(contests);
-                renderAdminDashboard();
-                showToastGreen("Concours supprimé.");
-            }
-        }
-
-        async function resetAllData() {
-            if (confirm("⚠️ ATTENTION : Cela réinitialisera l'ensemble des concours, résultats et demandes. Êtes-vous sûr ?")) {
-                await DB.saveContests([]);
-                await DB.saveResults([]);
-                await DB.saveResets([]);
-                await DB.saveSubscriptions([]);
-                await DB.saveReviews([]);
-                renderAdminDashboard();
-                showToastGreen("Toutes les données de l'application ont été réinitialisées.");
-            }
-        }
-
-        // MODALES ADMINISTRATEUR
-        async function openAdminUsersModal() {
-            const users = await DB.getUsers();
-            const tbody = document.getElementById('admin-users-table');
-            tbody.innerHTML = '';
-
-            users.forEach(u => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${u.name}</strong></td>
-                        <td>${u.school || 'N/A'} (${u.class || 'N/A'})</td>
-                        <td>${u.city || 'N/A'}</td>
-                        <td>${u.phone || 'N/A'}</td>
-                        <td>
-                            <button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteUser('${u.uid}')">Supprimer</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('modal-admin-users').classList.add('active');
-        }
-
-        async function deleteUser(uid) {
-            if (confirm("Supprimer cet utilisateur ?")) {
-                await database.ref('users/' + uid).remove();
-                openAdminUsersModal();
-                renderAdminDashboard();
-            }
-        }
-
-        async function openAdminResultsModal() {
-            const results = await DB.getResults();
-            const tbody = document.getElementById('admin-results-table');
-            tbody.innerHTML = '';
-
-            results.forEach(r => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${r.userName}</strong> (${r.userPhone})</td>
-                        <td>${r.contestTitle}</td>
-                        <td><span class="badge badge-class">${r.contestClass || 'N/A'}</span></td>
-                        <td>${r.date || 'N/A'}</td>
-                        <td><strong style="color:var(--civ-orange);">${r.score} / 10</strong></td>
-                    </tr>
-                `;
-            });
-            document.getElementById('modal-admin-results').classList.add('active');
-        }
-
-        async function openAdminResetsModal() {
-            const resets = await DB.getResets();
-            const list = document.getElementById('admin-resets-list');
-            list.innerHTML = '';
-
-            if (resets.length === 0) {
-                list.innerHTML = `<p style="color:var(--text-sub); font-size:0.8rem;">Aucune demande de réinitialisation.</p>`;
-            } else {
-                resets.forEach((r, idx) => {
-                    list.innerHTML += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-alt); padding:8px 12px; border-radius:8px; margin-bottom:6px; border:1px solid var(--border);">
-                            <div>
-                                <strong>${r.name}</strong> (${r.phone})
-                                <div style="font-size:0.7rem; color:var(--text-sub);">${r.date}</div>
-                            </div>
-                            <button class="btn btn-orange" style="padding:4px 8px; font-size:0.75rem;" onclick="processResetPass(${idx}, '${r.phone}')">Réinitialiser Mdp (5555)</button>
-                        </div>
-                    `;
-                });
-            }
-            document.getElementById('modal-admin-resets').classList.add('active');
-        }
-
-        async function processResetPass(idx, phone) {
-            alert(`Le mot de passe pour ${phone} a été réinitialisé par défaut à "5555".`);
-            let resets = await DB.getResets();
-            resets.splice(idx, 1);
-            await DB.saveResets(resets);
-            openAdminResetsModal();
-            renderAdminDashboard();
-        }
-
-        async function openAdminSubscriptionModal() {
-            const subs = await DB.getSubscriptions();
-            const tbody = document.getElementById('admin-subscriptions-table');
-            tbody.innerHTML = '';
-
-            subs.forEach((s, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${s.name}</strong></td>
-                        <td>${s.phone}</td>
-                        <td><span class="badge badge-class">${s.class}</span></td>
-                        <td><span class="badge ${s.status === 'Actif' ? 'badge-online' : 'badge-paid'}">${s.status}</span></td>
-                        <td>
-                            ${s.status === 'En attente' ? `<button class="btn btn-green" style="padding:2px 8px; font-size:0.7rem;" onclick="activateSub(${idx}, '${s.phone}')">Valider Abonnement</button>` : 'Validé'}
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('modal-admin-subscription').classList.add('active');
-        }
-
-        async function activateSub(idx, phone) {
-            const subs = await DB.getSubscriptions();
-            subs[idx].status = 'Actif';
-            await DB.saveSubscriptions(subs);
-
-            // Activation dans la base utilisateur Firebase
-            const users = await DB.getUsers();
-            const targetUser = users.find(u => u.phone === phone);
-            if (targetUser && targetUser.uid) {
-                const expiresAt = new Date();
-                expiresAt.setMonth(expiresAt.getMonth() + 1);
-                await database.ref('users/' + targetUser.uid + '/subscription').set({
-                    active: true,
-                    expiresAt: expiresAt.toISOString()
-                });
-            }
-
-            openAdminSubscriptionModal();
-            renderAdminDashboard();
-            showToastGreen("Abonnement activé pour 1 mois.");
-        }
-
-        // --- TOP 10 & CLASSEMENT GÉNÉRAL ADMIN ---
-        async function openTop10ModalAdmin() {
-            const stats = await computeUserAggregatedStats();
-            const sorted = stats.sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 10);
-
-            const tbody = document.getElementById('admin-top10-table-body');
-            tbody.innerHTML = '';
-
-            sorted.forEach((item, idx) => {
-                const avg = item.totalContests > 0 ? (item.totalPoints / item.totalContests).toFixed(1) : '0';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
-                        <td><strong>${item.lastname}</strong></td>
-                        <td>${item.firstname}</td>
-                        <td>${item.school}</td>
-                        <td>${item.city}</td>
-                        <td><span class="badge badge-class">${item.class}</span></td>
-                        <td>${item.totalContests}</td>
-                        <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
-                        <td>${avg} / 10</td>
-                    </tr>
-                `;
-            });
-            document.getElementById('modal-admin-top10').classList.add('active');
-        }
-
-        let currentAdminRankMode = 'level';
-
-        function openGeneralRankingModalAdmin() {
-            switchAdminRankingTab('level');
-            document.getElementById('modal-admin-general-ranking').classList.add('active');
-        }
-
-        function switchAdminRankingTab(mode) {
-            currentAdminRankMode = mode;
-            document.getElementById('btn-admin-rank-mode-level').className = mode === 'level' ? 'btn btn-secondary active' : 'btn btn-secondary';
-            document.getElementById('btn-admin-rank-mode-global').className = mode === 'global' ? 'btn btn-secondary active' : 'btn btn-secondary';
-
-            document.getElementById('admin-ranking-level-select-box').style.display = mode === 'level' ? 'block' : 'none';
-
-            if (mode === 'level') {
-                renderAdminLevelRanking();
-            } else {
-                renderAdminGlobalRanking();
-            }
-        }
-
-        async function renderAdminLevelRanking() {
-            const selectedClass = document.getElementById('admin-ranking-class-select').value;
-            const stats = await computeUserAggregatedStats();
-            const filtered = stats.filter(s => s.class === selectedClass).sort((a, b) => b.totalPoints - a.totalPoints);
-
-            const tbody = document.getElementById('admin-general-ranking-table-body');
-            tbody.innerHTML = '';
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Aucun élève enregistré dans cette classe.</td></tr>`;
-                return;
-            }
-
-            filtered.forEach((item, idx) => {
-                const avg = item.totalContests > 0 ? (item.totalPoints / item.totalContests).toFixed(1) : '0';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
-                        <td><strong>${item.lastname}</strong></td>
-                        <td>${item.firstname}</td>
-                        <td>${item.school}</td>
-                        <td>${item.city}</td>
-                        <td><span class="badge badge-class">${item.class}</span></td>
-                        <td>${item.totalContests}</td>
-                        <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
-                        <td>${avg} / 10</td>
-                    </tr>
-                `;
-            });
-        }
-
-        async function renderAdminGlobalRanking() {
-            const stats = await computeUserAggregatedStats();
-            const sorted = stats.sort((a, b) => b.totalPoints - a.totalPoints);
-
-            const tbody = document.getElementById('admin-general-ranking-table-body');
-            tbody.innerHTML = '';
-
-            sorted.forEach((item, idx) => {
-                const avg = item.totalContests > 0 ? (item.totalPoints / item.totalContests).toFixed(1) : '0';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong style="color:var(--civ-orange);">#${idx + 1}</strong></td>
-                        <td><strong>${item.lastname}</strong></td>
-                        <td>${item.firstname}</td>
-                        <td>${item.school}</td>
-                        <td>${item.city}</td>
-                        <td><span class="badge badge-class">${item.class}</span></td>
-                        <td>${item.totalContests}</td>
-                        <td><strong style="color:var(--civ-green);">${item.totalPoints} pts</strong></td>
-                        <td>${avg} / 10</td>
-                    </tr>
-                `;
-            });
-        }
-    </script>
-</body>
-</html>
+    .btn-pill-premium {
+      background: linear-gradient(135deg, #241A08 0%, #171105 100%);
+      border: 1.5px solid #F59E0B;
+      border-radius: var(--radius-xl);
+      padding: 16px 18px;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+      transition: var(--transition);
+      width: 100%;
+    }
+    .btn-pill-premium:active { transform: scale(0.98); }
+    
+    .btn-pill-premium-green {
+      background: linear-gradient(135deg, #092613 0%, #05170B 100%);
+      border-color: #10B981;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+    }
+
+    .pill-icon-circle {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(245, 158, 11, 0.2); display: flex;
+      align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .btn-pill-premium-green .pill-icon-circle { background: rgba(16, 185, 129, 0.2); }
+
+    /* BULLETIN DE NOTES */
+    .bulletin-container { padding: 16px; background: var(--bg-main); min-height: 100%; }
+    .bulletin-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .btn-back-link {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      color: #FFF; padding: 10px 16px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+
+    .bulletin-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      background: var(--bg-card); border-radius: var(--radius-lg);
+      overflow: hidden; border: 1px solid var(--border-light); margin-bottom: 20px;
+    }
+    .bulletin-table th {
+      background: #111827; color: var(--orange-ztv); padding: 12px 8px;
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      border-bottom: 1px solid var(--border-light); text-align: center;
+    }
+    .bulletin-table th:first-child { text-align: left; padding-left: 12px; }
+    .bulletin-table td { padding: 10px 8px; font-size: 12px; border-bottom: 1px solid #222C40; text-align: center; color: #FFF; }
+    .bulletin-table td:first-child { text-align: left; padding-left: 12px; font-weight: 600; }
+    
+    .section-title-row td {
+      background: #0D1322; color: var(--green-ztv); font-weight: 800;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1px; text-align: center !important; padding: 8px !important;
+    }
+
+    .inp-coef {
+      width: 42px; background: var(--bg-input); border: 1px solid var(--border-light);
+      color: #FFF; text-align: center; border-radius: 6px; padding: 6px; font-weight: 700; font-size: 12px;
+    }
+
+    .inp-note {
+      width: 58px; background: var(--bg-input); border: 1.5px solid var(--orange-ztv);
+      color: #FFF; text-align: center; border-radius: 8px; padding: 6px; font-weight: 800; font-size: 13px;
+    }
+
+    .summary-row td { background: #111827; font-weight: 800; color: var(--orange-ztv); font-size: 13px; border-top: 2px solid var(--border-light); }
+
+    /* MON PROFIL */
+    .profile-card-box {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl); padding: 24px 20px; margin: 16px;
+      box-shadow: var(--shadow-card); text-align: center;
+    }
+    .profile-avatar-large {
+      width: 95px; height: 95px; border-radius: 50%;
+      border: 3px solid var(--green-ztv); object-fit: cover;
+      margin-bottom: 12px; background: var(--bg-input); box-shadow: var(--glow-green);
+    }
+    .profile-field-list { text-align: left; margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+    .profile-field-item {
+      background: #111827; border: 1px solid var(--border-light);
+      border-radius: var(--radius-md); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .profile-field-label { font-size: 11px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; }
+    .profile-field-value { font-size: 13px; color: #FFF; font-weight: 800; }
+
+    /* ================= TABLEAU D'HONNEUR - DESIGN DIPLÔME VERTICAL PORTRAIT ================= */
+    .certif-selector-bar {
+      display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 16px;
+      scrollbar-width: none;
+    }
+    .certif-selector-bar::-webkit-scrollbar { display: none; }
+    .certif-tab-btn {
+      background: var(--bg-card); border: 1px solid var(--border-light);
+      color: var(--white); padding: 10px 16px; border-radius: var(--radius-pill);
+      font-size: 11px; font-weight: 800; whitespace: nowrap; cursor: pointer; transition: var(--transition);
+    }
+    .certif-tab-btn.active {
+      background: var(--orange-ztv); color: #000; border-color: #FFF; box-shadow: var(--glow-orange);
+    }
+
+    .portrait-cert-wrapper {
+      padding: 0 16px;
+      width: 100%;
+    }
+
+    /* BORDURE LUXUEUSE OFFICIELLE DIPLÔME VERTICAL PORTRAIT */
+    .certificate-portrait-frame {
+      background: #FFFDF8;
+      border: 8px double #92400E;
+      outline: 2px solid #D97706;
+      outline-offset: -5px;
+      border-radius: 16px;
+      padding: 24px 18px;
+      color: #1E293B;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+      width: 100%;
+      box-sizing: border-box;
+      margin: 0 auto;
+      background-image: radial-gradient(#F59E0B 0.5px, transparent 0.5px);
+      background-size: 16px 16px;
+    }
+
+    .cert-inner-border {
+      border: 1px solid rgba(180, 83, 9, 0.3);
+      padding: 18px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .cert-header-vertical {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2px solid #D97706;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      gap: 6px;
+    }
+
+    .cert-header-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .cert-title-portrait {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: #78350F;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cert-subtitle-gold {
+      font-size: 11px;
+      color: #09A63D;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .cert-body-vertical {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin: 14px 0;
+      gap: 10px;
+    
